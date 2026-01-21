@@ -25,7 +25,8 @@ export default function NumericInput({
       onChange(undefined);
     } else {
       const num = parseInt(val, 10);
-      if (!isNaN(num) && num >= min && num <= max) {
+      if (!isNaN(num)) {
+        // Allow typing any number, validation happens on submit
         onChange(num);
       }
     }

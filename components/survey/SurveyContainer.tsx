@@ -43,7 +43,11 @@ export default function SurveyContainer() {
       case 'multiple_exclusive':
         return Array.isArray(answer) && answer.length > 0;
       case 'numeric':
-        return typeof answer === 'number';
+        if (typeof answer !== 'number') return false;
+        // Validate range if min/max specified
+        if (currentQuestion.min !== undefined && answer < currentQuestion.min) return false;
+        if (currentQuestion.max !== undefined && answer > currentQuestion.max) return false;
+        return true;
       case 'text':
         return typeof answer === 'string' && answer.trim().length > 0;
       case 'scale':

@@ -37,8 +37,43 @@ const activitySegments: Option[] = [
   { value: 'orthodontie', label: 'Orthodontie et soins esthétiques' },
 ];
 
+// Options for Q21 - Perceived advantages of dental groups
+const perceivedAdvantages: Option[] = [
+  { value: 'A', label: 'Soutien administratif' },
+  { value: 'B', label: 'Accès à des technologies avancées' },
+  { value: 'C', label: 'Collaboration avec des confrères' },
+  { value: 'D', label: 'Formation continue facilitée' },
+  { value: 'E', label: 'Meilleur équilibre vie pro/perso' },
+  { value: 'F', label: 'Sécurité financière' },
+  { value: 'G', label: 'Je ne perçois pas d\'avantages', exclusive: true },
+];
+
+// Options for Q22 - Reluctances about dental groups
+const perceivedReluctances: Option[] = [
+  { value: 'A', label: 'Perte d\'autonomie clinique' },
+  { value: 'B', label: 'Pression sur la productivité' },
+  { value: 'C', label: 'Rémunération moins avantageuse' },
+  { value: 'D', label: 'Moins de relation personnelle avec les patients' },
+  { value: 'E', label: 'Standardisation des pratiques' },
+  { value: 'F', label: 'Je n\'ai pas de réticences', exclusive: true },
+];
+
 export const questions: Question[] = [
-  // SECTION A - Profile
+  // SECTION 0 - Routing Question
+  {
+    id: 'Q0',
+    type: 'single',
+    section: '0',
+    question: 'Dans quel type de structure exercez-vous actuellement ?',
+    required: true,
+    options: [
+      { value: 'A', label: 'Groupe dentaire (centre ou réseau de cabinets)' },
+      { value: 'B', label: 'Cabinet individuel indépendant' },
+      { value: 'C', label: 'Cabinet de groupe indépendant (plusieurs praticiens)' },
+    ],
+  },
+
+  // SECTION A - Profile (Both Branches)
   {
     id: 'Q1',
     type: 'numeric',
@@ -53,12 +88,12 @@ export const questions: Question[] = [
     id: 'Q2',
     type: 'multiple_exclusive',
     section: 'A',
-    question: 'Avez-vous travaillé via un autre mode d\'exercice avant de rejoindre un groupe ?',
+    question: 'Quel(s) mode(s) d\'exercice avez-vous pratiqué(s) au cours de votre carrière ?',
     subtitle: 'Sélectionnez toutes les réponses applicables',
     required: true,
     options: [
-      { value: 'A', label: 'Cabinet individuel indépendant' },
-      { value: 'B', label: 'Cabinet de groupe indépendant (plusieurs praticiens)' },
+      { value: 'A', label: 'Cabinet individuel indépendant - associé / fondateur' },
+      { value: 'B', label: 'Cabinet de groupe indépendant (plusieurs praticiens) - associé / fondateur' },
       { value: 'C', label: 'Salarié(e) dans un cabinet privé' },
       { value: 'D', label: 'Salarié(e) dans un centre ou groupe dentaire' },
       { value: 'E', label: 'Autre mode d\'exercice (p. ex. hôpital, université)' },
@@ -77,7 +112,7 @@ export const questions: Question[] = [
     placeholder: 'Ex: 3',
   },
 
-  // SECTION B - Scale Questions (Q4-Q13)
+  // SECTION B - Scale Questions for Branch A (Group Dentists) Q4-Q13
   {
     id: 'Q4',
     type: 'scale',
@@ -92,7 +127,7 @@ export const questions: Question[] = [
     id: 'Q5',
     type: 'scale',
     section: 'B',
-    question: 'Dans quelle mesure pensez-vous que votre affiliation à un groupe dentaire (centre ou réseau de cabinets) a contribué à votre développement professionnel ?',
+    question: 'Dans quelle mesure pensez-vous que votre affiliation à un groupe dentaire contribue à votre développement professionnel ?',
     min: 0,
     max: 10,
     required: true,
@@ -102,7 +137,7 @@ export const questions: Question[] = [
     id: 'Q6',
     type: 'scale',
     section: 'B',
-    question: 'Comment évaluez-vous votre satisfaction concernant l\'accès à la formation continue offert par le groupe dentaire (centre ou réseau de cabinets) ?',
+    question: 'Comment évaluez-vous votre satisfaction concernant l\'accès à la formation continue offert par le groupe dentaire ?',
     min: 0,
     max: 10,
     required: true,
@@ -112,17 +147,18 @@ export const questions: Question[] = [
     id: 'Q7',
     type: 'scale',
     section: 'B',
-    question: 'Comment jugez-vous l\'accès aux technologies et aux matériaux dentaires par rapport à un cabinet individuel ou de groupe indépendant ?',
+    question: 'Comment évaluez-vous votre satisfaction concernant l\'accès aux technologies et aux matériaux dentaires dans votre structure ?',
+    subtitle: 'Laisser vide si pas d\'avis et cliquer sur suivant',
     min: 0,
     max: 10,
-    required: true,
-    scaleLabels: { min: 'Bien moins bon', max: 'Bien meilleur' },
+    required: false,
+    scaleLabels: { min: 'Pas du tout satisfait', max: 'Très satisfait' },
   },
   {
     id: 'Q8',
     type: 'scale',
     section: 'B',
-    question: 'Dans quelle mesure votre affiliation à un groupe dentaire (centre ou réseau de cabinets) a-t-elle contribué à l\'amélioration de vos résultats cliniques ?',
+    question: 'Dans quelle mesure le groupe dentaire contribue-t-il à la qualité de vos soins / qualité clinique ?',
     min: 0,
     max: 10,
     required: true,
@@ -132,7 +168,7 @@ export const questions: Question[] = [
     id: 'Q9',
     type: 'scale',
     section: 'B',
-    question: 'Avez-vous bénéficié de la présence de confrères sur place pour gérer vos cas cliniques ?',
+    question: 'Dans quelle mesure bénéficiez-vous de la présence de confrères sur place pour gérer vos cas cliniques ?',
     min: 0,
     max: 10,
     required: true,
@@ -142,44 +178,173 @@ export const questions: Question[] = [
     id: 'Q10',
     type: 'scale',
     section: 'B',
-    question: 'Si vous avez travaillé auparavant dans un cabinet individuel, estimez-vous que la satisfaction des patients est plus élevée dans votre structure actuelle ?',
+    question: 'Si vous avez travaillé auparavant en pratique indépendante, estimez-vous que la satisfaction des patients est plus élevée dans votre structure actuelle ?',
+    subtitle: 'Laisser vide si pas d\'avis et cliquer sur suivant',
     min: 0,
     max: 10,
-    required: true,
+    required: false,
     scaleLabels: { min: 'Bien moins satisfaits', max: 'Bien plus satisfaits' },
   },
   {
     id: 'Q11',
     type: 'scale',
     section: 'B',
-    question: 'Pensez-vous qu\'exercer dans un groupe dentaire (centre ou réseau de cabinets) a amélioré votre sécurité vis-à-vis des risques professionnels (accidents exposition au sang, projections, matériaux, agressions, ...) ?',
+    question: 'Comment évaluez-vous votre niveau de sécurité vis-à-vis des risques professionnels (accidents exposition au sang, projections, matériaux, agressions, ...) ?',
     min: 0,
     max: 10,
     required: true,
-    scaleLabels: { min: 'Pas du tout', max: 'Énormément' },
+    scaleLabels: { min: 'Très exposé', max: 'Très protégé' },
   },
   {
     id: 'Q12',
     type: 'scale',
     section: 'B',
-    question: 'Le travail au sein d\'un groupe dentaire (centre ou réseau de cabinets) a-t-il amélioré votre équilibre personnel-professionnel ?',
+    question: 'Pensez-vous que le travail au sein d\'un groupe dentaire permet un meilleur équilibre personnel-professionnel ?',
+    subtitle: 'Laisser vide si pas d\'avis et cliquer sur suivant',
     min: 0,
     max: 10,
-    required: true,
+    required: false,
     scaleLabels: { min: 'Pas du tout', max: 'Énormément' },
   },
   {
     id: 'Q13',
     type: 'scale',
     section: 'B',
-    question: 'Êtes-vous satisfait de votre décision de travailler au sein d\'un groupe dentaire (centre ou réseau de cabinets) ?',
+    question: 'Êtes-vous satisfait de travailler au sein d\'un groupe dentaire ?',
     min: 0,
     max: 10,
     required: true,
     scaleLabels: { min: 'Pas du tout satisfait', max: 'Très satisfait' },
   },
 
-  // SECTION C - Activity Segments
+  // SECTION B - Scale Questions for Branch B (Independent Dentists) Q4i-Q12i
+  {
+    id: 'Q4i',
+    type: 'scale',
+    section: 'B',
+    question: 'Comment évaluez-vous l\'efficacité de votre gestion administrative et opérationnelle (facturation, planification) ?',
+    min: 0,
+    max: 10,
+    required: true,
+    scaleLabels: { min: 'Très inefficace', max: 'Très efficace' },
+  },
+  {
+    id: 'Q5i',
+    type: 'scale',
+    section: 'B',
+    question: 'Dans quelle mesure votre mode d\'exercice actuel contribue-t-il à votre développement professionnel ?',
+    min: 0,
+    max: 10,
+    required: true,
+    scaleLabels: { min: 'Pas du tout', max: 'Énormément' },
+  },
+  {
+    id: 'Q6i',
+    type: 'scale',
+    section: 'B',
+    question: 'Comment évaluez-vous votre satisfaction concernant l\'accès à la formation continue ?',
+    min: 0,
+    max: 10,
+    required: true,
+    scaleLabels: { min: 'Pas du tout satisfait', max: 'Très satisfait' },
+  },
+  {
+    id: 'Q7i',
+    type: 'scale',
+    section: 'B',
+    question: 'Comment évaluez-vous votre satisfaction concernant l\'accès aux technologies et aux matériaux dentaires dans votre structure ?',
+    subtitle: 'Laisser vide si pas d\'avis et cliquer sur suivant',
+    min: 0,
+    max: 10,
+    required: false,
+    scaleLabels: { min: 'Pas du tout satisfait', max: 'Très satisfait' },
+  },
+  {
+    id: 'Q8i',
+    type: 'scale',
+    section: 'B',
+    question: 'Dans quelle mesure votre mode d\'exercice contribue-t-il à la qualité de vos soins / qualité clinique ?',
+    min: 0,
+    max: 10,
+    required: true,
+    scaleLabels: { min: 'Pas du tout', max: 'Énormément' },
+  },
+  {
+    id: 'Q9i',
+    type: 'scale',
+    section: 'B',
+    question: 'Dans quelle mesure avez-vous accès à des confrères pour discuter ou gérer vos cas cliniques ?',
+    min: 0,
+    max: 10,
+    required: true,
+    scaleLabels: { min: 'Pas du tout', max: 'Énormément' },
+  },
+  {
+    id: 'Q10i',
+    type: 'scale',
+    section: 'B',
+    question: 'Comment évaluez-vous votre niveau de sécurité vis-à-vis des risques professionnels (accidents exposition au sang, projections, matériaux, agressions, ...) ?',
+    min: 0,
+    max: 10,
+    required: true,
+    scaleLabels: { min: 'Très exposé', max: 'Très protégé' },
+  },
+  {
+    id: 'Q11i',
+    type: 'scale',
+    section: 'B',
+    question: 'Pensez-vous que votre mode d\'exercice actuel permet un bon équilibre personnel-professionnel ?',
+    subtitle: 'Laisser vide si pas d\'avis et cliquer sur suivant',
+    min: 0,
+    max: 10,
+    required: false,
+    scaleLabels: { min: 'Pas du tout', max: 'Énormément' },
+  },
+  {
+    id: 'Q12i',
+    type: 'scale',
+    section: 'B',
+    question: 'Êtes-vous satisfait de votre mode d\'exercice actuel ?',
+    min: 0,
+    max: 10,
+    required: true,
+    scaleLabels: { min: 'Pas du tout satisfait', max: 'Très satisfait' },
+  },
+
+  // SECTION B2 - Perception of Dental Groups (Branch B only) Q20-Q22
+  {
+    id: 'Q20',
+    type: 'single',
+    section: 'B2',
+    question: 'Envisagez-vous de rejoindre un groupe dentaire dans les 5 prochaines années ?',
+    required: true,
+    options: [
+      { value: 'A', label: 'Oui, certainement' },
+      { value: 'B', label: 'Oui, peut-être' },
+      { value: 'C', label: 'Non, probablement pas' },
+      { value: 'D', label: 'Non, certainement pas' },
+    ],
+  },
+  {
+    id: 'Q21',
+    type: 'multiple_exclusive',
+    section: 'B2',
+    question: 'Quels avantages percevez-vous dans les groupes dentaires ?',
+    subtitle: 'Sélectionnez toutes les réponses applicables',
+    required: true,
+    options: perceivedAdvantages,
+  },
+  {
+    id: 'Q22',
+    type: 'multiple_exclusive',
+    section: 'B2',
+    question: 'Quelles sont vos principales réticences vis-à-vis des groupes dentaires ?',
+    subtitle: 'Sélectionnez toutes les réponses applicables',
+    required: true,
+    options: perceivedReluctances,
+  },
+
+  // SECTION C - Activity Segments (Both Branches)
   {
     id: 'Q14',
     type: 'multiple',
@@ -217,7 +382,7 @@ export const questions: Question[] = [
     options: activitySegments,
   },
 
-  // SECTION D - Contact
+  // SECTION D - Contact (Both Branches)
   {
     id: 'Q16',
     type: 'text',
@@ -237,11 +402,21 @@ export const questions: Question[] = [
       { value: 'non', label: 'Non' },
     ],
   },
+  {
+    id: 'Q18',
+    type: 'text',
+    section: 'D',
+    question: 'Quelle est votre adresse email ?',
+    placeholder: 'exemple@email.com',
+    required: true,
+  },
 ];
 
 export const sectionTitles: Record<string, string> = {
+  '0': 'Type de structure',
   'A': 'Profil',
   'B': 'Évaluation de la structure',
+  'B2': 'Perception des groupes dentaires',
   'C': 'Segments d\'activité',
   'D': 'Informations complémentaires',
 };
@@ -253,10 +428,31 @@ export function getQuestionFlow(answers: Record<string, any>): Question[] {
 
 // Determine if a question should be shown based on conditional logic
 export function shouldShowQuestion(question: Question, answers: Record<string, any>): boolean {
-  // Q10 conditional logic: Only show if Q2 includes 'A' (Cabinet individuel indépendant)
+  const practiceType = answers['Q0'] as string | undefined;
+
+  // Group dentist questions (Q4-Q13): Only show if Q0 = 'A'
+  const groupQuestions = ['Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13'];
+  if (groupQuestions.includes(question.id)) {
+    if (practiceType !== 'A') return false;
+  }
+
+  // Independent dentist questions (Q4i-Q12i, Q20-Q22): Only show if Q0 = 'B' or 'C'
+  const independentQuestions = ['Q4i', 'Q5i', 'Q6i', 'Q7i', 'Q8i', 'Q9i', 'Q10i', 'Q11i', 'Q12i', 'Q20', 'Q21', 'Q22'];
+  if (independentQuestions.includes(question.id)) {
+    if (practiceType !== 'B' && practiceType !== 'C') return false;
+  }
+
+  // Q10 additional conditional logic: Only show if Q2 includes 'A' or 'B' (independent experience)
   if (question.id === 'Q10') {
     const q2Answer = answers['Q2'] as string[] | undefined;
-    return q2Answer?.includes('A') ?? false;
+    const hasIndependentExperience = q2Answer?.includes('A') || q2Answer?.includes('B');
+    return hasIndependentExperience ?? false;
+  }
+
+  // Q18 (email) conditional logic: Only show if Q17 = 'oui'
+  if (question.id === 'Q18') {
+    const q17Answer = answers['Q17'] as string | undefined;
+    return q17Answer === 'oui';
   }
 
   return true;

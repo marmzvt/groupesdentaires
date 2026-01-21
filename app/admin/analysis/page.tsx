@@ -44,7 +44,7 @@ export default function AnalysisPage() {
   const router = useRouter();
   const [data, setData] = useState<AnalysisData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'comparisons' | 'activity' | 'perception'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'comparisons' | 'structures' | 'activity' | 'perception'>('overview');
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -125,7 +125,8 @@ export default function AnalysisPage() {
           <nav className="flex gap-6">
             {[
               { id: 'overview', label: 'Vue d\'ensemble' },
-              { id: 'comparisons', label: 'Comparaisons' },
+              { id: 'comparisons', label: 'Groupe vs Indép.' },
+              { id: 'structures', label: 'Entre structures' },
               { id: 'activity', label: 'Segments d\'activité' },
               { id: 'perception', label: 'Perceptions' },
             ].map((tab) => (
@@ -149,6 +150,7 @@ export default function AnalysisPage() {
       <main className="max-w-7xl mx-auto px-6 py-8">
         {activeTab === 'overview' && <OverviewTab data={data} />}
         {activeTab === 'comparisons' && <ComparisonsTab data={data} />}
+        {activeTab === 'structures' && <StructuresTab data={data} />}
         {activeTab === 'activity' && <ActivityTab data={data} />}
         {activeTab === 'perception' && <PerceptionTab data={data} />}
       </main>
@@ -736,6 +738,238 @@ function PerceptionTab({ data }: { data: AnalysisData }) {
       </div>
     </div>
   );
+}
+
+// ============================================
+// STRUCTURES TAB
+// ============================================
+
+function StructuresTab({ data }: { data: AnalysisData }) {
+  const structureData = data.structureAnalysis;
+
+  if (!structureData?.byStructure || structureData.byStructure.length === 0) {
+    return (
+      <div className="bg-white rounded-xl p-8 shadow-sm text-center">
+        <p className="text-gray-600">
+          Pas encore assez de réponses par structure pour l'analyse comparative.
+        </p>
+        <p className="text-gray-500 text-sm mt-2">
+          Minimum {structureData?.minN || 3} réponses par structure requis.
+        </p>
+      </div>
+    );
+  }
+
+  const structures = structureData.byStructure;
+  const themes = ['Administrative', 'Development', 'Education', 'Technology', 'Quality', 'Collaboration', 'Safety', 'WorkLife', 'Satisfaction'];
+
+  // Prepare data for ranking chart
+  const rankingData = structures.map((s: any) => ({
+    name: getStructureLabel(s.structure),
+    score: s.overallScore,
+    n: s.n,
+  }));
+
+  // Prepare data for theme comparison
+  const themeComparisonData = themes.map(theme => {
+    const row: any = { theme: getThemeLabel(theme) };
+    structures.forEach((s: any) => {
+      row[s.structure] = s.themes[theme]?.mean || 0;
+    });
+    return row;
+  });
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
+        <strong>Note:</strong> Comparaisons entre structures dentaires (minimum n={structureData.minN} par structure).
+        Les structures avec moins de réponses ne sont pas affichées.
+      </div>
+
+      {/* Overall Ranking */}
+      <div className="bg-white rounded-xl p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          Classement global par structure (score moyen 0-10)
+        </h3>
+        <div className="h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={rankingData} layout="vertical" margin={{ left: 120 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis type="number" domain={[0, 10]} />
+              <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 12 }} />
+              <Tooltip
+                formatter={(value: number, name: string, props: any) => [
+                  `${value.toFixed(2)} (n=${props.payload.n})`,
+                  'Score moyen'
+                ]}
+              />
+              <Bar dataKey="score" fill="#8b5cf6" radius={[0, 4, 4, 0]}>
+                {rankingData.map((entry: any, index: number) => (
+                  <Cell key={`cell-${index}`} fill={index === 0 ? '#22c55e' : index === rankingData.length - 1 ? '#ef4444' : '#8b5cf6'} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Theme-by-Theme Comparison Table */}
+      <div className="bg-white rounded-xl p-6 shadow-sm overflow-x-auto">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          Comparaison par thème
+        </h3>
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b">
+              <th className="text-left py-2 px-2">Thème</th>
+              {structures.map((s: any) => (
+                <th key={s.structure} className="text-center py-2 px-2">
+                  <div>{getStructureLabel(s.structure)}</div>
+                  <div className="text-xs text-gray-400 font-normal">(n={s.n})</div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {themes.map((theme) => {
+              const values = structures.map((s: any) => s.themes[theme]?.mean || 0);
+              const maxVal = Math.max(...values);
+              const minVal = Math.min(...values);
+
+              return (
+                <tr key={theme} className="border-b">
+                  <td className="py-2 px-2 font-medium">{getThemeLabel(theme)}</td>
+                  {structures.map((s: any) => {
+                    const val = s.themes[theme]?.mean || 0;
+                    const isMax = val === maxVal && maxVal !== minVal;
+                    const isMin = val === minVal && maxVal !== minVal;
+                    return (
+                      <td
+                        key={s.structure}
+                        className={`text-center py-2 px-2 ${
+                          isMax ? 'bg-green-50 text-green-700 font-semibold' :
+                          isMin ? 'bg-red-50 text-red-700' : ''
+                        }`}
+                      >
+                        {val.toFixed(1)}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pairwise Comparisons */}
+      {structureData.pairwiseComparisons && structureData.pairwiseComparisons.length > 0 && (
+        <div className="bg-white rounded-xl p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Comparaisons pairées (Satisfaction globale)
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-2">Structure 1</th>
+                  <th className="text-left py-2">Structure 2</th>
+                  <th className="text-center py-2">Différence</th>
+                  <th className="text-center py-2">Effet (r)</th>
+                  <th className="text-center py-2">Interprétation</th>
+                </tr>
+              </thead>
+              <tbody>
+                {structureData.pairwiseComparisons.map((comp: any, idx: number) => (
+                  <tr key={idx} className="border-b">
+                    <td className="py-2">
+                      {getStructureLabel(comp.structure1)}
+                      <span className="text-gray-400 text-xs ml-1">(n={comp.n1})</span>
+                    </td>
+                    <td className="py-2">
+                      {getStructureLabel(comp.structure2)}
+                      <span className="text-gray-400 text-xs ml-1">(n={comp.n2})</span>
+                    </td>
+                    <td className={`text-center py-2 ${comp.diff > 0 ? 'text-green-600' : comp.diff < 0 ? 'text-red-600' : ''}`}>
+                      {comp.diff > 0 ? '+' : ''}{comp.diff.toFixed(2)}
+                    </td>
+                    <td className="text-center py-2">
+                      {comp.effectSize.toFixed(3)}
+                    </td>
+                    <td className="text-center py-2">
+                      <span className={`px-2 py-1 rounded-full text-xs ${getEffectBadgeClass(comp.effectSize)}`}>
+                        {getEffectLabel(comp.effectSize)}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Structure Details */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {structures.map((s: any) => (
+          <div key={s.structure} className="bg-white rounded-xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {getStructureLabel(s.structure)}
+              </h3>
+              <span className="text-sm text-gray-500">n={s.n}</span>
+            </div>
+            <div className="space-y-2">
+              {themes.map(theme => {
+                const stats = s.themes[theme];
+                if (!stats || stats.n === 0) return null;
+                return (
+                  <div key={theme} className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600 w-24">{getThemeLabel(theme)}</span>
+                    <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary-500 rounded-full"
+                        style={{ width: `${(stats.mean / 10) * 100}%` }}
+                      />
+                    </div>
+                    <span className="text-sm font-medium w-10 text-right">{stats.mean.toFixed(1)}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-4 pt-4 border-t">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Score global moyen</span>
+                <span className="font-semibold text-primary-600">{s.overallScore.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function getThemeLabel(theme: string): string {
+  const labels: Record<string, string> = {
+    Administrative: 'Admin.',
+    Development: 'Dév. pro.',
+    Education: 'Formation',
+    Technology: 'Techno.',
+    Quality: 'Qualité',
+    Collaboration: 'Collab.',
+    Safety: 'Sécurité',
+    WorkLife: 'Équilibre',
+    Satisfaction: 'Satisfaction',
+  };
+  return labels[theme] || theme;
+}
+
+function getEffectBadgeClass(r: number): string {
+  const absR = Math.abs(r);
+  if (absR >= 0.5) return 'bg-green-100 text-green-700';
+  if (absR >= 0.3) return 'bg-yellow-100 text-yellow-700';
+  return 'bg-gray-100 text-gray-600';
 }
 
 // ============================================

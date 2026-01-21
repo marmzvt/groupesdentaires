@@ -359,7 +359,7 @@ export const questions: Question[] = [
     type: 'percentage_distribution',
     section: 'C',
     question: 'Comment se répartit votre activité actuelle entre ces segments ?',
-    subtitle: 'Répartissez 100% entre les segments (le total doit être égal à 100%)',
+    subtitle: 'Répartissez 100% de votre chiffre d\'affaires entre les segments (le total doit être égal à 100%)',
     required: true,
     options: activitySegments,
   },
@@ -377,7 +377,7 @@ export const questions: Question[] = [
     type: 'percentage_distribution',
     section: 'C',
     question: 'Comment anticipez-vous la répartition de votre activité dans 5 ans ?',
-    subtitle: 'Répartissez 100% entre les segments (le total doit être égal à 100%)',
+    subtitle: 'Répartissez 100% de votre chiffre d\'affaires entre les segments (le total doit être égal à 100%)',
     required: true,
     options: activitySegments,
   },
@@ -446,8 +446,8 @@ export function getQuestionFlow(answers: Record<string, any>): Question[] {
 export function shouldShowQuestion(question: Question, answers: Record<string, any>): boolean {
   const practiceType = answers['Q0'] as string | undefined;
 
-  // Group dentist questions (Q4-Q13): Only show if Q0 = 'A'
-  const groupQuestions = ['Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13'];
+  // Group dentist questions (Q4-Q13, Q16): Only show if Q0 = 'A'
+  const groupQuestions = ['Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q16'];
   if (groupQuestions.includes(question.id)) {
     if (practiceType !== 'A') return false;
   }

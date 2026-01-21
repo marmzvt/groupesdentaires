@@ -6,6 +6,7 @@ import {
   benjaminiHochberg,
   calculateCompositeIndex,
   spearmanCorrelation,
+  mannWhitneyU,
   mean,
   GroupComparisonResult,
   CompositeIndex,
@@ -326,19 +327,93 @@ function analyzeByStructure(groupResponses: any[]) {
     byStructure[structure].push(r);
   }
 
-  // Only analyze structures with n >= 5
-  const results: Record<string, { n: number; satisfaction: DescriptiveStats }> = {};
+  // Analyze all structures with n >= 3 (relaxed for small samples)
+  const MIN_N = 3;
+  const structureThemes = ['Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q11', 'Q12', 'Q13'];
+  const themeNames: Record<string, string> = {
+    Q4: 'Administrative',
+    Q5: 'Development',
+    Q6: 'Education',
+    Q7: 'Technology',
+    Q8: 'Quality',
+    Q9: 'Collaboration',
+    Q11: 'Safety',
+    Q12: 'WorkLife',
+    Q13: 'Satisfaction',
+  };
+
+  const results: Record<string, {
+    n: number;
+    themes: Record<string, DescriptiveStats>;
+    overallScore: number;
+  }> = {};
+
   for (const [structure, responses] of Object.entries(byStructure)) {
-    if (responses.length >= 5) {
-      const satisfactionValues = responses
-        .map(r => r.Q13)
-        .filter(v => typeof v === 'number');
+    if (responses.length >= MIN_N && structure !== 'unknown' && structure !== 'prefer_not_say') {
+      const themes: Record<string, DescriptiveStats> = {};
+      const allScores: number[] = [];
+
+      for (const themeKey of structureThemes) {
+        const values = responses
+          .map(r => r[themeKey])
+          .filter(v => typeof v === 'number');
+        themes[themeNames[themeKey]] = computeDescriptives(values);
+        allScores.push(...values);
+      }
+
       results[structure] = {
         n: responses.length,
-        satisfaction: computeDescriptives(satisfactionValues),
+        themes,
+        overallScore: allScores.length > 0 ? mean(allScores) : 0,
       };
     }
   }
 
-  return results;
+  // Sort by overall score descending
+  const sortedStructures = Object.entries(results)
+    .sort((a, b) => b[1].overallScore - a[1].overallScore)
+    .map(([key, value]) => ({ structure: key, ...value }));
+
+  // Pairwise comparisons between structures (if at least 2 structures with n >= MIN_N)
+  const structureKeys = Object.keys(results).filter(k => results[k].n >= MIN_N);
+  const pairwiseComparisons: {
+    structure1: string;
+    structure2: string;
+    theme: string;
+    diff: number;
+    effectSize: number;
+    n1: number;
+    n2: number;
+  }[] = [];
+
+  if (structureKeys.length >= 2) {
+    // Compare on overall satisfaction (Q13)
+    for (let i = 0; i < structureKeys.length; i++) {
+      for (let j = i + 1; j < structureKeys.length; j++) {
+        const s1 = structureKeys[i];
+        const s2 = structureKeys[j];
+        const data1 = byStructure[s1].map(r => r.Q13).filter(v => typeof v === 'number');
+        const data2 = byStructure[s2].map(r => r.Q13).filter(v => typeof v === 'number');
+
+        if (data1.length >= MIN_N && data2.length >= MIN_N) {
+          const mw = mannWhitneyU(data1, data2);
+          pairwiseComparisons.push({
+            structure1: s1,
+            structure2: s2,
+            theme: 'Satisfaction',
+            diff: mean(data1) - mean(data2),
+            effectSize: mw.effectSize,
+            n1: data1.length,
+            n2: data2.length,
+          });
+        }
+      }
+    }
+  }
+
+  return {
+    byStructure: sortedStructures,
+    pairwiseComparisons,
+    minN: MIN_N,
+  };
 }

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 interface ScaleSliderProps {
   value: number | undefined;
   onChange: (value: number) => void;
+  onAutoAdvance?: () => void;
   min?: number;
   max?: number;
   minLabel?: string;
@@ -14,12 +15,22 @@ interface ScaleSliderProps {
 export default function ScaleSlider({
   value,
   onChange,
+  onAutoAdvance,
   min = 0,
   max = 10,
   minLabel = 'Pas du tout d\'accord',
   maxLabel = 'Tout à fait d\'accord',
 }: ScaleSliderProps) {
   const numbers = Array.from({ length: max - min + 1 }, (_, i) => min + i);
+
+  const handleSelect = (num: number) => {
+    onChange(num);
+    if (onAutoAdvance) {
+      setTimeout(() => {
+        onAutoAdvance();
+      }, 400);
+    }
+  };
 
   return (
     <motion.div
@@ -33,7 +44,7 @@ export default function ScaleSlider({
             key={num}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => onChange(num)}
+            onClick={() => handleSelect(num)}
             className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl font-semibold text-sm sm:text-base transition-all touch-feedback
               ${value === num
                 ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30'

@@ -143,9 +143,9 @@ export default function SurveyContainer() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [goToNext, goToPrevious]);
 
-  // Auto-advance handler for single choice
+  // Auto-advance handler for single choice and scale questions
   const handleAutoAdvance = useCallback(() => {
-    if (!isLastQuestion && currentQuestion?.type === 'single') {
+    if (!isLastQuestion && (currentQuestion?.type === 'single' || currentQuestion?.type === 'scale')) {
       setDirection(1);
       setCurrentIndex((prev) => prev + 1);
     }

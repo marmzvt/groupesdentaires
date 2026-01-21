@@ -97,6 +97,7 @@ export default function QuestionCard({
           <ScaleSlider
             value={value}
             onChange={onChange}
+            onAutoAdvance={onAutoAdvance}
             min={question.min}
             max={question.max}
             minLabel={question.scaleLabels?.min}

@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
+import Link from 'next/link';
 import {
   BarChart,
   Bar,
@@ -78,25 +79,39 @@ const segmentLabels: Record<string, string> = {
 };
 
 const questionTitles: Record<string, string> = {
+  Q0: 'Type de structure',
   Q1: 'Année début exercice',
   Q2: 'Mode d\'exercice précédent',
   Q3: 'Années d\'affiliation',
-  Q4: 'Soutien administratif',
-  Q5: 'Développement professionnel',
-  Q6: 'Formation continue',
-  Q7: 'Accès technologies',
-  Q8: 'Résultats cliniques',
-  Q9: 'Présence confrères',
-  Q10: 'Satisfaction patients',
-  Q11: 'Sécurité risques',
-  Q12: 'Équilibre vie pro/perso',
-  Q13: 'Satisfaction décision',
+  Q4: 'Soutien administratif (Groupe)',
+  Q5: 'Développement professionnel (Groupe)',
+  Q6: 'Formation continue (Groupe)',
+  Q7: 'Accès technologies (Groupe)',
+  Q8: 'Qualité clinique (Groupe)',
+  Q9: 'Présence confrères (Groupe)',
+  Q10: 'Satisfaction patients (Groupe)',
+  Q11: 'Sécurité risques (Groupe)',
+  Q12: 'Équilibre vie pro/perso (Groupe)',
+  Q13: 'Satisfaction globale (Groupe)',
+  Q4i: 'Gestion administrative (Indép.)',
+  Q5i: 'Développement professionnel (Indép.)',
+  Q6i: 'Formation continue (Indép.)',
+  Q7i: 'Accès technologies (Indép.)',
+  Q8i: 'Qualité clinique (Indép.)',
+  Q9i: 'Accès confrères (Indép.)',
+  Q10i: 'Sécurité risques (Indép.)',
+  Q11i: 'Équilibre vie pro/perso (Indép.)',
+  Q12i: 'Satisfaction globale (Indép.)',
+  Q20: 'Intention rejoindre groupe',
+  Q21: 'Avantages perçus groupes',
+  Q22: 'Réticences groupes',
   Q14: 'Segments actuels actifs',
   Q14b: 'Répartition actuelle (%)',
   Q15: 'Segments anticipés en hausse',
   Q15b: 'Répartition future (%)',
   Q16: 'Structure',
   Q17: 'Autorisation contact',
+  Q18: 'Email',
 };
 
 // Helper to format value with labels
@@ -377,6 +392,15 @@ export default function AdminDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <h1 className="text-xl font-bold text-gray-900">Tableau de bord - Groupes Dentaires</h1>
           <div className="flex items-center gap-4">
+            <Link
+              href="/admin/analysis"
+              className="px-4 py-2 bg-purple-500 text-white font-medium rounded-lg hover:bg-purple-600 transition-colors flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Analyse Statistique
+            </Link>
             <button
               onClick={handleExport}
               className="px-4 py-2 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2"

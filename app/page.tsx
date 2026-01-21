@@ -80,6 +80,40 @@ export default function Home() {
             Commencer
           </motion.button>
         </Link>
+
+        {/* Author Signature */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="mt-16 pt-8 border-t border-gray-200"
+        >
+          <div className="flex flex-col items-center text-center">
+            <div className="w-12 h-12 mb-4 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center shadow-md">
+              <span className="text-white font-bold text-lg">MM</span>
+            </div>
+            <p className="text-gray-900 font-semibold text-lg">
+              Dr Marco Mazevet
+            </p>
+            <p className="text-gray-600 text-sm mt-1 leading-relaxed">
+              Docteur en Chirurgie-Dentaire
+              <br />
+              Docteur en Santé Publique
+            </p>
+            <p className="text-primary-600 text-xs font-medium mt-2 tracking-wide uppercase">
+              Alliance pour un Futur Sans Carie Fellow (ACFF)
+            </p>
+            <a
+              href="mailto:marco.mazevet@gmail.com"
+              className="mt-3 text-gray-500 text-sm hover:text-primary-500 transition-colors flex items-center gap-1.5"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              marco.mazevet@gmail.com
+            </a>
+          </div>
+        </motion.div>
       </motion.div>
     </main>
   );

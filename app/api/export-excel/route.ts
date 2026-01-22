@@ -138,96 +138,81 @@ function mapResponseToTemplate(response: any, index: number): (string | number)[
   // Column J: Q4 - Time spent at current place (from Q3)
   row.push(data.Q3 ?? '');
 
-  // Columns K-S: Q5 to Q13 - Scale scores
-  // Map Group (Q4-Q13) or Independent (Q4i-Q12i) to unified columns
+  // Columns K-T: Q5 to Q13_global - Scale scores
   if (isGroup) {
-    // Group: Q4->Q5, Q5->Q6, Q6->Q7, Q7->Q8, Q8->Q9, Q9->Q10, Q10->Q11, Q11->Q12, Q12->Q13
-    row.push(data.Q4 ?? '');   // Q5: Admin efficiency
-    row.push(data.Q5 ?? '');   // Q6: Professional development
-    row.push(data.Q6 ?? '');   // Q7: Continuing education
-    row.push(data.Q7 ?? '');   // Q8: Technology access
-    row.push(data.Q8 ?? '');   // Q9: Clinical quality
-    row.push(data.Q9 ?? '');   // Q10: Peer collaboration
-    row.push(data.Q10 ?? '');  // Q11: Patient satisfaction (group only)
-    row.push(data.Q11 ?? '');  // Q12: Professional safety
-    row.push(data.Q12 ?? '');  // Q13: Work-life balance
-    row.push(data.Q13 ?? '');  // Q13_global: Overall satisfaction
+    row.push(data.Q4 ?? '');
+    row.push(data.Q5 ?? '');
+    row.push(data.Q6 ?? '');
+    row.push(data.Q7 ?? '');
+    row.push(data.Q8 ?? '');
+    row.push(data.Q9 ?? '');
+    row.push(data.Q10 ?? '');
+    row.push(data.Q11 ?? '');
+    row.push(data.Q12 ?? '');
+    row.push(data.Q13 ?? '');
   } else {
-    // Independent: Q4i->Q5, Q5i->Q6, Q6i->Q7, Q7i->Q8, Q8i->Q9, Q9i->Q10, n/a->Q11, Q10i->Q12, Q11i->Q13, Q12i->Q13_global
-    row.push(data.Q4i ?? '');  // Q5: Admin efficiency
-    row.push(data.Q5i ?? '');  // Q6: Professional development
-    row.push(data.Q6i ?? '');  // Q7: Continuing education
-    row.push(data.Q7i ?? '');  // Q8: Technology access
-    row.push(data.Q8i ?? '');  // Q9: Clinical quality
-    row.push(data.Q9i ?? '');  // Q10: Peer collaboration
-    row.push('n/a');           // Q11: Patient satisfaction (not asked to independents)
-    row.push(data.Q10i ?? ''); // Q12: Professional safety
-    row.push(data.Q11i ?? ''); // Q13: Work-life balance
-    row.push(data.Q12i ?? ''); // Q13_global: Overall satisfaction
+    row.push(data.Q4i ?? '');
+    row.push(data.Q5i ?? '');
+    row.push(data.Q6i ?? '');
+    row.push(data.Q7i ?? '');
+    row.push(data.Q8i ?? '');
+    row.push(data.Q9i ?? '');
+    row.push('n/a');
+    row.push(data.Q10i ?? '');
+    row.push(data.Q11i ?? '');
+    row.push(data.Q12i ?? '');
   }
 
-  // Column T: Q14 - Would you work for group (Q20, only for independents)
+  // Column U: Q14 - Would you work for group (Q20, only for independents)
   if (isGroup) {
     row.push('n/a');
   } else {
     row.push(q20Labels[data.Q20] || data.Q20 || '');
   }
 
-  // Columns U-AA: Q15_1 to Q15_7 - Perceived advantages (binary from Q21)
+  // Columns V-AB: Q15_1 to Q15_7 - Perceived advantages
   const q21Array = Array.isArray(data.Q21) ? data.Q21 : [];
   q21Options.forEach(opt => {
-    if (isGroup) {
-      row.push('n/a');
-    } else {
-      row.push(q21Array.includes(opt) ? 1 : 0);
-    }
+    row.push(isGroup ? 'n/a' : (q21Array.includes(opt) ? 1 : 0));
   });
 
-  // Columns AB-AG: Q16_1 to Q16_6 - Perceived disadvantages (binary from Q22)
+  // Columns AC-AH: Q16_1 to Q16_6 - Perceived disadvantages
   const q22Array = Array.isArray(data.Q22) ? data.Q22 : [];
   q22Options.forEach(opt => {
-    if (isGroup) {
-      row.push('n/a');
-    } else {
-      row.push(q22Array.includes(opt) ? 1 : 0);
-    }
+    row.push(isGroup ? 'n/a' : (q22Array.includes(opt) ? 1 : 0));
   });
 
-  // Columns AH-AL: Q17_1 to Q17_5 - High activity segments (binary from Q14)
+  // Columns AI-AM: Q17_1 to Q17_5 - High activity segments
   const q14Array = Array.isArray(data.Q14) ? data.Q14 : [];
   segments.forEach(seg => {
     row.push(q14Array.includes(seg) ? 1 : 0);
   });
 
-  // Columns AM-AQ: Q18_1 to Q18_5 - Activity percentages (from Q14b)
+  // Columns AN-AR: Q18_1 to Q18_5 - Activity percentages
   const q14b = data.Q14b || {};
   segments.forEach(seg => {
     row.push(q14b[seg] ?? '');
   });
 
-  // Columns AR-AV: Q19_1 to Q19_5 - Future high activity segments (binary from Q15)
+  // Columns AS-AW: Q19_1 to Q19_5 - Future high activity segments
   const q15Array = Array.isArray(data.Q15) ? data.Q15 : [];
   segments.forEach(seg => {
     row.push(q15Array.includes(seg) ? 1 : 0);
   });
 
-  // Columns AW-BA: Q20_1 to Q20_5 - Future activity percentages (from Q15b)
+  // Columns AX-BB: Q20_1 to Q20_5 - Future activity percentages
   const q15b = data.Q15b || {};
   segments.forEach(seg => {
     row.push(q15b[seg] ?? '');
   });
 
-  // Column BB: Q21 - Group name (Q16, only for groups)
-  if (isGroup) {
-    row.push(q16Labels[data.Q16] || data.Q16 || '');
-  } else {
-    row.push('n/a');
-  }
+  // Column BC: Q21 - Group name
+  row.push(isGroup ? (q16Labels[data.Q16] || data.Q16 || '') : 'n/a');
 
-  // Column BC: Q22 - Can we contact (Q17)
+  // Column BD: Q22 - Can we contact
   row.push(data.Q17 === 'oui' ? 'Yes' : data.Q17 === 'non' ? 'No' : '');
 
-  // Column BD: Q23 - Email (Q18)
+  // Column BE: Q23 - Email
   row.push(data.Q18 || '');
 
   return row;
@@ -237,10 +222,8 @@ function mapResponseToTemplate(response: any, index: number): (string | number)[
 function createDataSheet(workbook: ExcelJS.Workbook, responses: any[]) {
   const sheet = workbook.addWorksheet('Template for responses');
 
-  // Add headers
   sheet.addRow(templateHeaders);
 
-  // Style header row
   const headerRow = sheet.getRow(1);
   headerRow.font = { bold: true };
   headerRow.fill = {
@@ -249,200 +232,698 @@ function createDataSheet(workbook: ExcelJS.Workbook, responses: any[]) {
     fgColor: { argb: 'FFE0E0E0' },
   };
 
-  // Add data rows
   responses.forEach((response, index) => {
     const rowData = mapResponseToTemplate(response, index);
     sheet.addRow(rowData);
   });
 
-  // Auto-fit columns (approximate)
   sheet.columns.forEach((column, i) => {
     const header = templateHeaders[i] || '';
     column.width = Math.min(Math.max(header.length * 0.8, 10), 40);
   });
 
-  // Freeze header row
   sheet.views = [{ state: 'frozen', ySplit: 1 }];
 
   return sheet;
 }
 
-// Create the analysis sheet with formulas
-function createAnalysisSheet(workbook: ExcelJS.Workbook, responseCount: number) {
-  const sheet = workbook.addWorksheet('Analysis1');
+// ========================================
+// FRENCH ANALYSIS SHEET
+// ========================================
+function createAnalysisSheetFR(workbook: ExcelJS.Workbook) {
+  const sheet = workbook.addWorksheet('Analyse FR');
   const dataSheet = 'Template for responses';
-
-  // Helper to create cell references
   const col = (letter: string) => `'${dataSheet}'!${letter}:${letter}`;
-  const cell = (letter: string, row: number) => `'${dataSheet}'!${letter}${row}`;
 
-  // Title
-  sheet.getCell('B2').value = 'Analyse des réponses - Groupes Dentaires';
-  sheet.getCell('B2').font = { bold: true, size: 16 };
+  let currentRow = 2;
 
-  // Sample Size Section
-  sheet.getCell('B4').value = 'Taille de l\'échantillon';
-  sheet.getCell('B4').font = { bold: true, size: 14 };
+  // Helper function to add a section title
+  const addSectionTitle = (title: string, size: number = 14) => {
+    sheet.getCell(`B${currentRow}`).value = title;
+    sheet.getCell(`B${currentRow}`).font = { bold: true, size };
+    currentRow += 2;
+  };
 
-  sheet.getCell('B5').value = 'Total répondants';
-  sheet.getCell('C5').value = { formula: `COUNTA(${col('A')})-1` };
+  // Helper for table headers
+  const addTableHeaders = (headers: string[], startCol: string = 'B') => {
+    const cols = 'BCDEFGHIJ'.split('');
+    headers.forEach((h, i) => {
+      const cell = sheet.getCell(`${cols[i]}${currentRow}`);
+      cell.value = h;
+      cell.font = { bold: true };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E4576' } };
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    });
+    currentRow++;
+  };
 
-  sheet.getCell('B6').value = 'Groupe dentaire';
-  sheet.getCell('C6').value = { formula: `COUNTIF(${col('B')},"Groupe dentaire*")` };
+  // ========================================
+  // TITLE
+  // ========================================
+  sheet.getCell('B2').value = 'ANALYSE COMPLÈTE DU QUESTIONNAIRE DENTISTES';
+  sheet.getCell('B2').font = { bold: true, size: 18, color: { argb: 'FF1E4576' } };
+  currentRow = 5;
 
-  sheet.getCell('B7').value = 'Cabinet indépendant';
-  sheet.getCell('C7').value = { formula: `COUNTIF(${col('B')},"Cabinet*")` };
+  // ========================================
+  // SECTION 1: TAILLE DE L'ÉCHANTILLON
+  // ========================================
+  addSectionTitle('1. TAILLE DE L\'ÉCHANTILLON');
 
-  // Score Comparison Section
-  sheet.getCell('B10').value = 'Comparaison des scores moyens (0-10)';
-  sheet.getCell('B10').font = { bold: true, size: 14 };
+  sheet.getCell(`B${currentRow}`).value = 'Total répondants';
+  sheet.getCell(`C${currentRow}`).value = { formula: `COUNTA(${col('A')})-1` };
+  currentRow++;
 
-  // Headers for score comparison
-  sheet.getCell('B11').value = 'Thème';
-  sheet.getCell('C11').value = 'Groupe';
-  sheet.getCell('D11').value = 'Indépendant';
-  sheet.getCell('E11').value = 'Différence';
-  [sheet.getCell('B11'), sheet.getCell('C11'), sheet.getCell('D11'), sheet.getCell('E11')].forEach(cell => {
-    cell.font = { bold: true };
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0E0E0' } };
+  sheet.getCell(`B${currentRow}`).value = 'Groupe dentaire';
+  sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col('B')},"Groupe dentaire*")` };
+  currentRow++;
+
+  sheet.getCell(`B${currentRow}`).value = 'Cabinet individuel indépendant';
+  sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col('B')},"Cabinet individuel*")` };
+  currentRow++;
+
+  sheet.getCell(`B${currentRow}`).value = 'Cabinet de groupe indépendant';
+  sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col('B')},"Cabinet de groupe*")` };
+  currentRow += 3;
+
+  // ========================================
+  // SECTION 2: PROFIL DES RÉPONDANTS
+  // ========================================
+  addSectionTitle('2. PROFIL DES RÉPONDANTS');
+
+  // Q2: Année début exercice
+  sheet.getCell(`B${currentRow}`).value = 'Année moyenne début exercice';
+  sheet.getCell(`B${currentRow}`).font = { bold: true };
+  currentRow++;
+
+  addTableHeaders(['Groupe', 'Moyenne', 'Min', 'Max']);
+
+  sheet.getCell(`B${currentRow}`).value = 'Groupe dentaire';
+  sheet.getCell(`C${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Groupe dentaire*",${col('C')})` };
+  sheet.getCell(`D${currentRow}`).value = { formula: `MINIFS(${col('C')},${col('B')},"Groupe dentaire*")` };
+  sheet.getCell(`E${currentRow}`).value = { formula: `MAXIFS(${col('C')},${col('B')},"Groupe dentaire*")` };
+  currentRow++;
+
+  sheet.getCell(`B${currentRow}`).value = 'Indépendant';
+  sheet.getCell(`C${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Cabinet*",${col('C')})` };
+  sheet.getCell(`D${currentRow}`).value = { formula: `MINIFS(${col('C')},${col('B')},"Cabinet*")` };
+  sheet.getCell(`E${currentRow}`).value = { formula: `MAXIFS(${col('C')},${col('B')},"Cabinet*")` };
+  currentRow += 2;
+
+  // Q3: Expérience antérieure
+  sheet.getCell(`B${currentRow}`).value = 'Expérience antérieure (% ayant coché)';
+  sheet.getCell(`B${currentRow}`).font = { bold: true };
+  currentRow++;
+
+  addTableHeaders(['Type d\'expérience', 'Total', '% Total']);
+
+  const q3Labels = [
+    'Cabinet individuel indépendant',
+    'Cabinet de groupe indépendant',
+    'Salarié cabinet privé',
+    'Salarié centre dentaire',
+    'Autre mode',
+    'Première expérience',
+  ];
+  const q3Cols = ['D', 'E', 'F', 'G', 'H', 'I'];
+
+  q3Labels.forEach((label, i) => {
+    sheet.getCell(`B${currentRow}`).value = label;
+    sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col(q3Cols[i])},1)` };
+    sheet.getCell(`D${currentRow}`).value = { formula: `C${currentRow}/(COUNTA(${col('A')})-1)*100` };
+    sheet.getCell(`D${currentRow}`).numFmt = '0.0"%"';
+    currentRow++;
   });
+  currentRow += 2;
 
-  // Score themes with column references (K=11, L=12, etc.)
+  // Q4: Années dans structure
+  sheet.getCell(`B${currentRow}`).value = 'Années dans la structure actuelle';
+  sheet.getCell(`B${currentRow}`).font = { bold: true };
+  currentRow++;
+
+  addTableHeaders(['Groupe', 'Moyenne', 'Min', 'Max']);
+
+  sheet.getCell(`B${currentRow}`).value = 'Groupe dentaire';
+  sheet.getCell(`C${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Groupe dentaire*",${col('J')})` };
+  sheet.getCell(`D${currentRow}`).value = { formula: `MINIFS(${col('J')},${col('B')},"Groupe dentaire*")` };
+  sheet.getCell(`E${currentRow}`).value = { formula: `MAXIFS(${col('J')},${col('B')},"Groupe dentaire*")` };
+  currentRow++;
+
+  sheet.getCell(`B${currentRow}`).value = 'Indépendant';
+  sheet.getCell(`C${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Cabinet*",${col('J')})` };
+  sheet.getCell(`D${currentRow}`).value = { formula: `MINIFS(${col('J')},${col('B')},"Cabinet*")` };
+  sheet.getCell(`E${currentRow}`).value = { formula: `MAXIFS(${col('J')},${col('B')},"Cabinet*")` };
+  currentRow += 3;
+
+  // ========================================
+  // SECTION 3: SCORES D'ÉVALUATION (0-10)
+  // ========================================
+  addSectionTitle('3. SCORES D\'ÉVALUATION (0-10) - COMPARAISON GROUPE VS INDÉPENDANT');
+
+  addTableHeaders(['Thème', 'Moy. Groupe', 'Moy. Indép.', 'Différence', 'Avantage']);
+
   const scoreThemes = [
-    { name: 'Soutien administratif', col: 'K' },
-    { name: 'Développement professionnel', col: 'L' },
-    { name: 'Formation continue', col: 'M' },
-    { name: 'Accès technologies', col: 'N' },
-    { name: 'Qualité clinique', col: 'O' },
-    { name: 'Présence confrères', col: 'P' },
-    { name: 'Satisfaction patients', col: 'Q' },
-    { name: 'Sécurité professionnelle', col: 'R' },
-    { name: 'Équilibre vie pro/perso', col: 'S' },
-    { name: 'Satisfaction globale', col: 'T' },
+    { name: 'Soutien administratif', col: 'K', questionFR: 'Efficacité du soutien administratif' },
+    { name: 'Développement professionnel', col: 'L', questionFR: 'Contribution au développement professionnel' },
+    { name: 'Formation continue', col: 'M', questionFR: 'Satisfaction formation continue' },
+    { name: 'Accès technologies', col: 'N', questionFR: 'Accès aux technologies dentaires' },
+    { name: 'Qualité clinique', col: 'O', questionFR: 'Contribution à la qualité clinique' },
+    { name: 'Présence confrères', col: 'P', questionFR: 'Bénéfice de la présence de confrères' },
+    { name: 'Satisfaction patients*', col: 'Q', questionFR: 'Satisfaction patients (Groupes seulement)' },
+    { name: 'Sécurité professionnelle', col: 'R', questionFR: 'Niveau de sécurité professionnelle' },
+    { name: 'Équilibre vie pro/perso', col: 'S', questionFR: 'Équilibre vie professionnelle/personnelle' },
+    { name: 'SATISFACTION GLOBALE', col: 'T', questionFR: 'Satisfaction globale avec le mode d\'exercice' },
   ];
 
-  scoreThemes.forEach((theme, i) => {
-    const row = 12 + i;
-    sheet.getCell(`B${row}`).value = theme.name;
-    sheet.getCell(`C${row}`).value = { formula: `AVERAGEIF(${col('B')},"Groupe dentaire*",${col(theme.col)})` };
-    sheet.getCell(`D${row}`).value = { formula: `AVERAGEIF(${col('B')},"Cabinet*",${col(theme.col)})` };
-    sheet.getCell(`E${row}`).value = { formula: `C${row}-D${row}` };
+  scoreThemes.forEach((theme) => {
+    sheet.getCell(`B${currentRow}`).value = theme.name;
+    sheet.getCell(`C${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Groupe dentaire*",${col(theme.col)})` };
+    sheet.getCell(`D${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Cabinet*",${col(theme.col)})` };
+    sheet.getCell(`E${currentRow}`).value = { formula: `C${currentRow}-D${currentRow}` };
+    sheet.getCell(`F${currentRow}`).value = { formula: `IF(E${currentRow}>0.5,"Groupe",IF(E${currentRow}<-0.5,"Indépendant","≈ Égal"))` };
 
-    // Number formatting
     ['C', 'D', 'E'].forEach(c => {
-      sheet.getCell(`${c}${row}`).numFmt = '0.00';
+      sheet.getCell(`${c}${currentRow}`).numFmt = '0.00';
     });
+
+    if (theme.name === 'SATISFACTION GLOBALE') {
+      sheet.getCell(`B${currentRow}`).font = { bold: true };
+    }
+    currentRow++;
   });
 
-  // Activity Segment Analysis
-  const activityStartRow = 25;
-  sheet.getCell(`B${activityStartRow}`).value = 'Répartition de l\'activité (%)';
-  sheet.getCell(`B${activityStartRow}`).font = { bold: true, size: 14 };
+  sheet.getCell(`B${currentRow}`).value = '* Question posée uniquement aux dentistes en groupe';
+  sheet.getCell(`B${currentRow}`).font = { italic: true, size: 10 };
+  currentRow += 3;
 
-  sheet.getCell(`B${activityStartRow + 1}`).value = 'Segment';
-  sheet.getCell(`C${activityStartRow + 1}`).value = 'Actuel - Groupe';
-  sheet.getCell(`D${activityStartRow + 1}`).value = 'Actuel - Indép.';
-  sheet.getCell(`E${activityStartRow + 1}`).value = 'Futur - Groupe';
-  sheet.getCell(`F${activityStartRow + 1}`).value = 'Futur - Indép.';
-  ['B', 'C', 'D', 'E', 'F'].forEach(c => {
-    const cell = sheet.getCell(`${c}${activityStartRow + 1}`);
-    cell.font = { bold: true };
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0E0E0' } };
-  });
+  // ========================================
+  // SECTION 4: QUESTIONS SPÉCIFIQUES AUX INDÉPENDANTS
+  // ========================================
+  addSectionTitle('4. QUESTIONS SPÉCIFIQUES AUX INDÉPENDANTS');
 
-  // Activity segment columns: Current (AM-AQ), Future (AW-BA)
-  const activitySegments = [
-    { name: 'Soins préventifs', currentCol: 'AN', futureCol: 'AX' },
-    { name: 'Hygiène de base', currentCol: 'AO', futureCol: 'AY' },
-    { name: 'Prothèses', currentCol: 'AP', futureCol: 'AZ' },
-    { name: 'Implants', currentCol: 'AQ', futureCol: 'BA' },
-    { name: 'Orthodontie/Esthétique', currentCol: 'AR', futureCol: 'BB' },
-  ];
+  // Q14/Q20: Intention de rejoindre un groupe
+  sheet.getCell(`B${currentRow}`).value = 'Intention de rejoindre un groupe dentaire';
+  sheet.getCell(`B${currentRow}`).font = { bold: true };
+  currentRow++;
 
-  activitySegments.forEach((seg, i) => {
-    const row = activityStartRow + 2 + i;
-    sheet.getCell(`B${row}`).value = seg.name;
-    sheet.getCell(`C${row}`).value = { formula: `AVERAGEIF(${col('B')},"Groupe dentaire*",${col(seg.currentCol)})` };
-    sheet.getCell(`D${row}`).value = { formula: `AVERAGEIF(${col('B')},"Cabinet*",${col(seg.currentCol)})` };
-    sheet.getCell(`E${row}`).value = { formula: `AVERAGEIF(${col('B')},"Groupe dentaire*",${col(seg.futureCol)})` };
-    sheet.getCell(`F${row}`).value = { formula: `AVERAGEIF(${col('B')},"Cabinet*",${col(seg.futureCol)})` };
-
-    ['C', 'D', 'E', 'F'].forEach(c => {
-      sheet.getCell(`${c}${row}`).numFmt = '0.0';
-    });
-  });
-
-  // Perception Analysis (Independents only)
-  const perceptionStartRow = 35;
-  sheet.getCell(`B${perceptionStartRow}`).value = 'Perception des groupes dentaires (Indépendants uniquement)';
-  sheet.getCell(`B${perceptionStartRow}`).font = { bold: true, size: 14 };
-
-  // Likelihood to join
-  sheet.getCell(`B${perceptionStartRow + 2}`).value = 'Intention de rejoindre un groupe';
-  sheet.getCell(`B${perceptionStartRow + 2}`).font = { bold: true };
+  addTableHeaders(['Réponse', 'Nombre', 'Pourcentage']);
 
   const likelihoodOptions = [
-    { name: 'Oui, certainement', searchText: 'Oui, certainement' },
-    { name: 'Oui, peut-être', searchText: 'Oui, peut-être' },
-    { name: 'Non, probablement pas', searchText: 'Non, probablement pas' },
-    { name: 'Non, certainement pas', searchText: 'Non, certainement pas' },
+    'Oui, certainement',
+    'Oui, peut-être',
+    'Non, probablement pas',
+    'Non, certainement pas',
   ];
 
-  likelihoodOptions.forEach((opt, i) => {
-    const row = perceptionStartRow + 3 + i;
-    sheet.getCell(`B${row}`).value = opt.name;
-    sheet.getCell(`C${row}`).value = { formula: `COUNTIF(${col('U')},"${opt.searchText}")` };
-    sheet.getCell(`D${row}`).value = { formula: `C${row}/COUNTA(${col('U')})*100` };
-    sheet.getCell(`D${row}`).numFmt = '0.0"%"';
+  likelihoodOptions.forEach(opt => {
+    sheet.getCell(`B${currentRow}`).value = opt;
+    sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col('U')},"${opt}")` };
+    sheet.getCell(`D${currentRow}`).value = { formula: `C${currentRow}/COUNTIF(${col('U')},"<>n/a")*100` };
+    sheet.getCell(`D${currentRow}`).numFmt = '0.0"%"';
+    currentRow++;
   });
+  currentRow += 2;
 
-  // Perceived advantages
-  const advantagesStartRow = perceptionStartRow + 9;
-  sheet.getCell(`B${advantagesStartRow}`).value = 'Avantages perçus';
-  sheet.getCell(`B${advantagesStartRow}`).font = { bold: true };
+  // Q15/Q21: Avantages perçus
+  sheet.getCell(`B${currentRow}`).value = 'Avantages perçus des groupes dentaires';
+  sheet.getCell(`B${currentRow}`).font = { bold: true };
+  currentRow++;
+
+  addTableHeaders(['Avantage', 'Nombre', 'Pourcentage']);
 
   const advantages = [
     { name: 'Soutien administratif', col: 'V' },
-    { name: 'Technologies avancées', col: 'W' },
-    { name: 'Collaboration confrères', col: 'X' },
-    { name: 'Formation continue', col: 'Y' },
-    { name: 'Équilibre vie pro/perso', col: 'Z' },
+    { name: 'Accès technologies avancées', col: 'W' },
+    { name: 'Collaboration avec confrères', col: 'X' },
+    { name: 'Formation continue facilitée', col: 'Y' },
+    { name: 'Meilleur équilibre vie pro/perso', col: 'Z' },
     { name: 'Sécurité financière', col: 'AA' },
-    { name: 'Pas d\'avantages perçus', col: 'AB' },
+    { name: 'Je ne perçois pas d\'avantages', col: 'AB' },
   ];
 
-  advantages.forEach((adv, i) => {
-    const row = advantagesStartRow + 1 + i;
-    sheet.getCell(`B${row}`).value = adv.name;
-    sheet.getCell(`C${row}`).value = { formula: `COUNTIF(${col(adv.col)},1)` };
+  advantages.forEach(adv => {
+    sheet.getCell(`B${currentRow}`).value = adv.name;
+    sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col(adv.col)},1)` };
+    sheet.getCell(`D${currentRow}`).value = { formula: `C${currentRow}/COUNTIF(${col('U')},"<>n/a")*100` };
+    sheet.getCell(`D${currentRow}`).numFmt = '0.0"%"';
+    currentRow++;
   });
+  currentRow += 2;
 
-  // Reluctances
-  const reluctancesStartRow = advantagesStartRow + 10;
-  sheet.getCell(`B${reluctancesStartRow}`).value = 'Réticences';
-  sheet.getCell(`B${reluctancesStartRow}`).font = { bold: true };
+  // Q16/Q22: Réticences
+  sheet.getCell(`B${currentRow}`).value = 'Réticences vis-à-vis des groupes dentaires';
+  sheet.getCell(`B${currentRow}`).font = { bold: true };
+  currentRow++;
+
+  addTableHeaders(['Réticence', 'Nombre', 'Pourcentage']);
 
   const reluctances = [
-    { name: 'Perte d\'autonomie', col: 'AC' },
-    { name: 'Pression productivité', col: 'AD' },
-    { name: 'Rémunération', col: 'AE' },
-    { name: 'Relation patients', col: 'AF' },
-    { name: 'Standardisation', col: 'AG' },
-    { name: 'Pas de réticences', col: 'AH' },
+    { name: 'Perte d\'autonomie clinique', col: 'AC' },
+    { name: 'Pression sur la productivité', col: 'AD' },
+    { name: 'Rémunération moins avantageuse', col: 'AE' },
+    { name: 'Moins de relation personnelle avec patients', col: 'AF' },
+    { name: 'Standardisation des pratiques', col: 'AG' },
+    { name: 'Je n\'ai pas de réticences', col: 'AH' },
   ];
 
-  reluctances.forEach((rel, i) => {
-    const row = reluctancesStartRow + 1 + i;
-    sheet.getCell(`B${row}`).value = rel.name;
-    sheet.getCell(`C${row}`).value = { formula: `COUNTIF(${col(rel.col)},1)` };
+  reluctances.forEach(rel => {
+    sheet.getCell(`B${currentRow}`).value = rel.name;
+    sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col(rel.col)},1)` };
+    sheet.getCell(`D${currentRow}`).value = { formula: `C${currentRow}/COUNTIF(${col('U')},"<>n/a")*100` };
+    sheet.getCell(`D${currentRow}`).numFmt = '0.0"%"';
+    currentRow++;
   });
+  currentRow += 3;
+
+  // ========================================
+  // SECTION 5: SEGMENTS D'ACTIVITÉ
+  // ========================================
+  addSectionTitle('5. SEGMENTS D\'ACTIVITÉ');
+
+  // Current activity
+  sheet.getCell(`B${currentRow}`).value = 'Répartition actuelle de l\'activité (% du CA)';
+  sheet.getCell(`B${currentRow}`).font = { bold: true };
+  currentRow++;
+
+  addTableHeaders(['Segment', 'Moy. Groupe', 'Moy. Indép.', 'Différence']);
+
+  const activitySegments = [
+    { name: 'Soins préventifs', col: 'AN' },
+    { name: 'Hygiène de base', col: 'AO' },
+    { name: 'Prothèses fixes et amovibles', col: 'AP' },
+    { name: 'Implants', col: 'AQ' },
+    { name: 'Orthodontie et soins esthétiques', col: 'AR' },
+  ];
+
+  activitySegments.forEach(seg => {
+    sheet.getCell(`B${currentRow}`).value = seg.name;
+    sheet.getCell(`C${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Groupe dentaire*",${col(seg.col)})` };
+    sheet.getCell(`D${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Cabinet*",${col(seg.col)})` };
+    sheet.getCell(`E${currentRow}`).value = { formula: `C${currentRow}-D${currentRow}` };
+    ['C', 'D', 'E'].forEach(c => {
+      sheet.getCell(`${c}${currentRow}`).numFmt = '0.0';
+    });
+    currentRow++;
+  });
+  currentRow += 2;
+
+  // Future activity
+  sheet.getCell(`B${currentRow}`).value = 'Répartition anticipée dans 5 ans (% du CA)';
+  sheet.getCell(`B${currentRow}`).font = { bold: true };
+  currentRow++;
+
+  addTableHeaders(['Segment', 'Moy. Groupe', 'Moy. Indép.', 'Évolution Grp', 'Évolution Ind']);
+
+  const futureActivitySegments = [
+    { name: 'Soins préventifs', currentCol: 'AN', futureCol: 'AX' },
+    { name: 'Hygiène de base', currentCol: 'AO', futureCol: 'AY' },
+    { name: 'Prothèses fixes et amovibles', currentCol: 'AP', futureCol: 'AZ' },
+    { name: 'Implants', currentCol: 'AQ', futureCol: 'BA' },
+    { name: 'Orthodontie et soins esthétiques', currentCol: 'AR', futureCol: 'BB' },
+  ];
+
+  futureActivitySegments.forEach(seg => {
+    sheet.getCell(`B${currentRow}`).value = seg.name;
+    sheet.getCell(`C${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Groupe dentaire*",${col(seg.futureCol)})` };
+    sheet.getCell(`D${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Cabinet*",${col(seg.futureCol)})` };
+    sheet.getCell(`E${currentRow}`).value = { formula: `C${currentRow}-AVERAGEIF(${col('B')},"Groupe dentaire*",${col(seg.currentCol)})` };
+    sheet.getCell(`F${currentRow}`).value = { formula: `D${currentRow}-AVERAGEIF(${col('B')},"Cabinet*",${col(seg.currentCol)})` };
+    ['C', 'D', 'E', 'F'].forEach(c => {
+      sheet.getCell(`${c}${currentRow}`).numFmt = '0.0';
+    });
+    currentRow++;
+  });
+  currentRow += 3;
+
+  // ========================================
+  // SECTION 6: STRUCTURES (GROUPES SEULEMENT)
+  // ========================================
+  addSectionTitle('6. RÉPARTITION PAR STRUCTURE (Groupes seulement)');
+
+  addTableHeaders(['Structure', 'Nombre', 'Pourcentage']);
+
+  const structures = Object.entries(q16Labels);
+  structures.forEach(([key, label]) => {
+    sheet.getCell(`B${currentRow}`).value = label;
+    sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col('BC')},"${label}")` };
+    sheet.getCell(`D${currentRow}`).value = { formula: `C${currentRow}/COUNTIF(${col('B')},"Groupe dentaire*")*100` };
+    sheet.getCell(`D${currentRow}`).numFmt = '0.0"%"';
+    currentRow++;
+  });
+  currentRow += 3;
+
+  // ========================================
+  // SECTION 7: CONTACT
+  // ========================================
+  addSectionTitle('7. AUTORISATION DE CONTACT');
+
+  addTableHeaders(['Réponse', 'Nombre', 'Pourcentage']);
+
+  sheet.getCell(`B${currentRow}`).value = 'Oui';
+  sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col('BD')},"Yes")` };
+  sheet.getCell(`D${currentRow}`).value = { formula: `C${currentRow}/(COUNTA(${col('A')})-1)*100` };
+  sheet.getCell(`D${currentRow}`).numFmt = '0.0"%"';
+  currentRow++;
+
+  sheet.getCell(`B${currentRow}`).value = 'Non';
+  sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col('BD')},"No")` };
+  sheet.getCell(`D${currentRow}`).value = { formula: `C${currentRow}/(COUNTA(${col('A')})-1)*100` };
+  sheet.getCell(`D${currentRow}`).numFmt = '0.0"%"';
 
   // Set column widths
-  sheet.getColumn('B').width = 35;
-  sheet.getColumn('C').width = 18;
-  sheet.getColumn('D').width = 18;
-  sheet.getColumn('E').width = 18;
-  sheet.getColumn('F').width = 18;
+  sheet.getColumn('B').width = 45;
+  sheet.getColumn('C').width = 15;
+  sheet.getColumn('D').width = 15;
+  sheet.getColumn('E').width = 15;
+  sheet.getColumn('F').width = 15;
+
+  return sheet;
+}
+
+// ========================================
+// ENGLISH ANALYSIS SHEET
+// ========================================
+function createAnalysisSheetEN(workbook: ExcelJS.Workbook) {
+  const sheet = workbook.addWorksheet('Analysis EN');
+  const dataSheet = 'Template for responses';
+  const col = (letter: string) => `'${dataSheet}'!${letter}:${letter}`;
+
+  let currentRow = 2;
+
+  const addSectionTitle = (title: string, size: number = 14) => {
+    sheet.getCell(`B${currentRow}`).value = title;
+    sheet.getCell(`B${currentRow}`).font = { bold: true, size };
+    currentRow += 2;
+  };
+
+  const addTableHeaders = (headers: string[]) => {
+    const cols = 'BCDEFGHIJ'.split('');
+    headers.forEach((h, i) => {
+      const cell = sheet.getCell(`${cols[i]}${currentRow}`);
+      cell.value = h;
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E4576' } };
+    });
+    currentRow++;
+  };
+
+  // ========================================
+  // TITLE
+  // ========================================
+  sheet.getCell('B2').value = 'COMPLETE SURVEY ANALYSIS - DENTISTS';
+  sheet.getCell('B2').font = { bold: true, size: 18, color: { argb: 'FF1E4576' } };
+  currentRow = 5;
+
+  // ========================================
+  // SECTION 1: SAMPLE SIZE
+  // ========================================
+  addSectionTitle('1. SAMPLE SIZE');
+
+  sheet.getCell(`B${currentRow}`).value = 'Total respondents';
+  sheet.getCell(`C${currentRow}`).value = { formula: `COUNTA(${col('A')})-1` };
+  currentRow++;
+
+  sheet.getCell(`B${currentRow}`).value = 'Dental group';
+  sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col('B')},"Groupe dentaire*")` };
+  currentRow++;
+
+  sheet.getCell(`B${currentRow}`).value = 'Independent individual practice';
+  sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col('B')},"Cabinet individuel*")` };
+  currentRow++;
+
+  sheet.getCell(`B${currentRow}`).value = 'Independent group practice';
+  sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col('B')},"Cabinet de groupe*")` };
+  currentRow += 3;
+
+  // ========================================
+  // SECTION 2: RESPONDENT PROFILE
+  // ========================================
+  addSectionTitle('2. RESPONDENT PROFILE');
+
+  sheet.getCell(`B${currentRow}`).value = 'Average year started practicing';
+  sheet.getCell(`B${currentRow}`).font = { bold: true };
+  currentRow++;
+
+  addTableHeaders(['Group', 'Average', 'Min', 'Max']);
+
+  sheet.getCell(`B${currentRow}`).value = 'Dental group';
+  sheet.getCell(`C${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Groupe dentaire*",${col('C')})` };
+  sheet.getCell(`D${currentRow}`).value = { formula: `MINIFS(${col('C')},${col('B')},"Groupe dentaire*")` };
+  sheet.getCell(`E${currentRow}`).value = { formula: `MAXIFS(${col('C')},${col('B')},"Groupe dentaire*")` };
+  currentRow++;
+
+  sheet.getCell(`B${currentRow}`).value = 'Independent';
+  sheet.getCell(`C${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Cabinet*",${col('C')})` };
+  sheet.getCell(`D${currentRow}`).value = { formula: `MINIFS(${col('C')},${col('B')},"Cabinet*")` };
+  sheet.getCell(`E${currentRow}`).value = { formula: `MAXIFS(${col('C')},${col('B')},"Cabinet*")` };
+  currentRow += 2;
+
+  // Previous experience
+  sheet.getCell(`B${currentRow}`).value = 'Previous experience (% who selected)';
+  sheet.getCell(`B${currentRow}`).font = { bold: true };
+  currentRow++;
+
+  addTableHeaders(['Experience type', 'Total', '% Total']);
+
+  const q3LabelsEN = [
+    'Independent individual practice - partner/founder',
+    'Independent group practice - partner/founder',
+    'Employee in private practice',
+    'Employee in dental center/group',
+    'Other practice mode',
+    'First professional experience',
+  ];
+  const q3Cols = ['D', 'E', 'F', 'G', 'H', 'I'];
+
+  q3LabelsEN.forEach((label, i) => {
+    sheet.getCell(`B${currentRow}`).value = label;
+    sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col(q3Cols[i])},1)` };
+    sheet.getCell(`D${currentRow}`).value = { formula: `C${currentRow}/(COUNTA(${col('A')})-1)*100` };
+    sheet.getCell(`D${currentRow}`).numFmt = '0.0"%"';
+    currentRow++;
+  });
+  currentRow += 2;
+
+  // Years in structure
+  sheet.getCell(`B${currentRow}`).value = 'Years in current structure';
+  sheet.getCell(`B${currentRow}`).font = { bold: true };
+  currentRow++;
+
+  addTableHeaders(['Group', 'Average', 'Min', 'Max']);
+
+  sheet.getCell(`B${currentRow}`).value = 'Dental group';
+  sheet.getCell(`C${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Groupe dentaire*",${col('J')})` };
+  sheet.getCell(`D${currentRow}`).value = { formula: `MINIFS(${col('J')},${col('B')},"Groupe dentaire*")` };
+  sheet.getCell(`E${currentRow}`).value = { formula: `MAXIFS(${col('J')},${col('B')},"Groupe dentaire*")` };
+  currentRow++;
+
+  sheet.getCell(`B${currentRow}`).value = 'Independent';
+  sheet.getCell(`C${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Cabinet*",${col('J')})` };
+  sheet.getCell(`D${currentRow}`).value = { formula: `MINIFS(${col('J')},${col('B')},"Cabinet*")` };
+  sheet.getCell(`E${currentRow}`).value = { formula: `MAXIFS(${col('J')},${col('B')},"Cabinet*")` };
+  currentRow += 3;
+
+  // ========================================
+  // SECTION 3: EVALUATION SCORES (0-10)
+  // ========================================
+  addSectionTitle('3. EVALUATION SCORES (0-10) - GROUP VS INDEPENDENT COMPARISON');
+
+  addTableHeaders(['Theme', 'Group Avg', 'Indep. Avg', 'Difference', 'Advantage']);
+
+  const scoreThemesEN = [
+    { name: 'Administrative support', col: 'K' },
+    { name: 'Professional development', col: 'L' },
+    { name: 'Continuing education', col: 'M' },
+    { name: 'Technology access', col: 'N' },
+    { name: 'Clinical quality', col: 'O' },
+    { name: 'Peer collaboration', col: 'P' },
+    { name: 'Patient satisfaction*', col: 'Q' },
+    { name: 'Professional safety', col: 'R' },
+    { name: 'Work-life balance', col: 'S' },
+    { name: 'OVERALL SATISFACTION', col: 'T' },
+  ];
+
+  scoreThemesEN.forEach((theme) => {
+    sheet.getCell(`B${currentRow}`).value = theme.name;
+    sheet.getCell(`C${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Groupe dentaire*",${col(theme.col)})` };
+    sheet.getCell(`D${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Cabinet*",${col(theme.col)})` };
+    sheet.getCell(`E${currentRow}`).value = { formula: `C${currentRow}-D${currentRow}` };
+    sheet.getCell(`F${currentRow}`).value = { formula: `IF(E${currentRow}>0.5,"Group",IF(E${currentRow}<-0.5,"Independent","≈ Equal"))` };
+
+    ['C', 'D', 'E'].forEach(c => {
+      sheet.getCell(`${c}${currentRow}`).numFmt = '0.00';
+    });
+
+    if (theme.name === 'OVERALL SATISFACTION') {
+      sheet.getCell(`B${currentRow}`).font = { bold: true };
+    }
+    currentRow++;
+  });
+
+  sheet.getCell(`B${currentRow}`).value = '* Question only asked to group dentists';
+  sheet.getCell(`B${currentRow}`).font = { italic: true, size: 10 };
+  currentRow += 3;
+
+  // ========================================
+  // SECTION 4: INDEPENDENT-SPECIFIC QUESTIONS
+  // ========================================
+  addSectionTitle('4. INDEPENDENT-SPECIFIC QUESTIONS');
+
+  sheet.getCell(`B${currentRow}`).value = 'Intention to join a dental group';
+  sheet.getCell(`B${currentRow}`).font = { bold: true };
+  currentRow++;
+
+  addTableHeaders(['Response', 'Count', 'Percentage']);
+
+  const likelihoodOptionsEN = [
+    { fr: 'Oui, certainement', en: 'Yes, definitely' },
+    { fr: 'Oui, peut-être', en: 'Yes, maybe' },
+    { fr: 'Non, probablement pas', en: 'No, probably not' },
+    { fr: 'Non, certainement pas', en: 'No, definitely not' },
+  ];
+
+  likelihoodOptionsEN.forEach(opt => {
+    sheet.getCell(`B${currentRow}`).value = opt.en;
+    sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col('U')},"${opt.fr}")` };
+    sheet.getCell(`D${currentRow}`).value = { formula: `C${currentRow}/COUNTIF(${col('U')},"<>n/a")*100` };
+    sheet.getCell(`D${currentRow}`).numFmt = '0.0"%"';
+    currentRow++;
+  });
+  currentRow += 2;
+
+  // Perceived advantages
+  sheet.getCell(`B${currentRow}`).value = 'Perceived advantages of dental groups';
+  sheet.getCell(`B${currentRow}`).font = { bold: true };
+  currentRow++;
+
+  addTableHeaders(['Advantage', 'Count', 'Percentage']);
+
+  const advantagesEN = [
+    { name: 'Administrative support', col: 'V' },
+    { name: 'Access to advanced technology', col: 'W' },
+    { name: 'Collaboration with colleagues', col: 'X' },
+    { name: 'Easier continuing education', col: 'Y' },
+    { name: 'Better work-life balance', col: 'Z' },
+    { name: 'Financial security', col: 'AA' },
+    { name: 'I don\'t perceive any advantages', col: 'AB' },
+  ];
+
+  advantagesEN.forEach(adv => {
+    sheet.getCell(`B${currentRow}`).value = adv.name;
+    sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col(adv.col)},1)` };
+    sheet.getCell(`D${currentRow}`).value = { formula: `C${currentRow}/COUNTIF(${col('U')},"<>n/a")*100` };
+    sheet.getCell(`D${currentRow}`).numFmt = '0.0"%"';
+    currentRow++;
+  });
+  currentRow += 2;
+
+  // Reluctances
+  sheet.getCell(`B${currentRow}`).value = 'Reluctances about dental groups';
+  sheet.getCell(`B${currentRow}`).font = { bold: true };
+  currentRow++;
+
+  addTableHeaders(['Reluctance', 'Count', 'Percentage']);
+
+  const reluctancesEN = [
+    { name: 'Loss of clinical autonomy', col: 'AC' },
+    { name: 'Productivity pressure', col: 'AD' },
+    { name: 'Less advantageous compensation', col: 'AE' },
+    { name: 'Less personal patient relationships', col: 'AF' },
+    { name: 'Practice standardization', col: 'AG' },
+    { name: 'I have no reluctance', col: 'AH' },
+  ];
+
+  reluctancesEN.forEach(rel => {
+    sheet.getCell(`B${currentRow}`).value = rel.name;
+    sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col(rel.col)},1)` };
+    sheet.getCell(`D${currentRow}`).value = { formula: `C${currentRow}/COUNTIF(${col('U')},"<>n/a")*100` };
+    sheet.getCell(`D${currentRow}`).numFmt = '0.0"%"';
+    currentRow++;
+  });
+  currentRow += 3;
+
+  // ========================================
+  // SECTION 5: ACTIVITY SEGMENTS
+  // ========================================
+  addSectionTitle('5. ACTIVITY SEGMENTS');
+
+  sheet.getCell(`B${currentRow}`).value = 'Current activity distribution (% of revenue)';
+  sheet.getCell(`B${currentRow}`).font = { bold: true };
+  currentRow++;
+
+  addTableHeaders(['Segment', 'Group Avg', 'Indep. Avg', 'Difference']);
+
+  const activitySegmentsEN = [
+    { name: 'Preventive care', col: 'AN' },
+    { name: 'Basic hygiene', col: 'AO' },
+    { name: 'Fixed and removable prosthetics', col: 'AP' },
+    { name: 'Implants', col: 'AQ' },
+    { name: 'Orthodontics and aesthetic care', col: 'AR' },
+  ];
+
+  activitySegmentsEN.forEach(seg => {
+    sheet.getCell(`B${currentRow}`).value = seg.name;
+    sheet.getCell(`C${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Groupe dentaire*",${col(seg.col)})` };
+    sheet.getCell(`D${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Cabinet*",${col(seg.col)})` };
+    sheet.getCell(`E${currentRow}`).value = { formula: `C${currentRow}-D${currentRow}` };
+    ['C', 'D', 'E'].forEach(c => {
+      sheet.getCell(`${c}${currentRow}`).numFmt = '0.0';
+    });
+    currentRow++;
+  });
+  currentRow += 2;
+
+  // Future activity
+  sheet.getCell(`B${currentRow}`).value = 'Anticipated distribution in 5 years (% of revenue)';
+  sheet.getCell(`B${currentRow}`).font = { bold: true };
+  currentRow++;
+
+  addTableHeaders(['Segment', 'Group Avg', 'Indep. Avg', 'Grp Change', 'Ind Change']);
+
+  const futureActivitySegmentsEN = [
+    { name: 'Preventive care', currentCol: 'AN', futureCol: 'AX' },
+    { name: 'Basic hygiene', currentCol: 'AO', futureCol: 'AY' },
+    { name: 'Fixed and removable prosthetics', currentCol: 'AP', futureCol: 'AZ' },
+    { name: 'Implants', currentCol: 'AQ', futureCol: 'BA' },
+    { name: 'Orthodontics and aesthetic care', currentCol: 'AR', futureCol: 'BB' },
+  ];
+
+  futureActivitySegmentsEN.forEach(seg => {
+    sheet.getCell(`B${currentRow}`).value = seg.name;
+    sheet.getCell(`C${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Groupe dentaire*",${col(seg.futureCol)})` };
+    sheet.getCell(`D${currentRow}`).value = { formula: `AVERAGEIF(${col('B')},"Cabinet*",${col(seg.futureCol)})` };
+    sheet.getCell(`E${currentRow}`).value = { formula: `C${currentRow}-AVERAGEIF(${col('B')},"Groupe dentaire*",${col(seg.currentCol)})` };
+    sheet.getCell(`F${currentRow}`).value = { formula: `D${currentRow}-AVERAGEIF(${col('B')},"Cabinet*",${col(seg.currentCol)})` };
+    ['C', 'D', 'E', 'F'].forEach(c => {
+      sheet.getCell(`${c}${currentRow}`).numFmt = '0.0';
+    });
+    currentRow++;
+  });
+  currentRow += 3;
+
+  // ========================================
+  // SECTION 6: CONTACT AUTHORIZATION
+  // ========================================
+  addSectionTitle('6. CONTACT AUTHORIZATION');
+
+  addTableHeaders(['Response', 'Count', 'Percentage']);
+
+  sheet.getCell(`B${currentRow}`).value = 'Yes';
+  sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col('BD')},"Yes")` };
+  sheet.getCell(`D${currentRow}`).value = { formula: `C${currentRow}/(COUNTA(${col('A')})-1)*100` };
+  sheet.getCell(`D${currentRow}`).numFmt = '0.0"%"';
+  currentRow++;
+
+  sheet.getCell(`B${currentRow}`).value = 'No';
+  sheet.getCell(`C${currentRow}`).value = { formula: `COUNTIF(${col('BD')},"No")` };
+  sheet.getCell(`D${currentRow}`).value = { formula: `C${currentRow}/(COUNTA(${col('A')})-1)*100` };
+  sheet.getCell(`D${currentRow}`).numFmt = '0.0"%"';
+
+  // Set column widths
+  sheet.getColumn('B').width = 45;
+  sheet.getColumn('C').width = 15;
+  sheet.getColumn('D').width = 15;
+  sheet.getColumn('E').width = 15;
+  sheet.getColumn('F').width = 15;
 
   return sheet;
 }
@@ -454,25 +935,23 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
 
-    // Create workbook
     const workbook = new ExcelJS.Workbook();
     workbook.creator = 'Groupes Dentaires Survey';
     workbook.created = new Date();
 
-    // Create sheets
+    // Create all sheets
     createDataSheet(workbook, responses);
-    createAnalysisSheet(workbook, responses.length);
+    createAnalysisSheetFR(workbook);
+    createAnalysisSheetEN(workbook);
 
-    // Generate buffer
     const buffer = await workbook.xlsx.writeBuffer();
-
     const date = new Date().toISOString().split('T')[0];
 
     return new NextResponse(buffer, {
       status: 200,
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': `attachment; filename="groupesdentaires-structured-${date}.xlsx"`,
+        'Content-Disposition': `attachment; filename="groupesdentaires-analysis-${date}.xlsx"`,
       },
     });
   } catch (error) {

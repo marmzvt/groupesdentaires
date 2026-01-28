@@ -399,7 +399,6 @@ export const questions: Question[] = [
       { value: 'panadent', label: 'Panadent' },
       { value: 'dentalys', label: 'Dentalys' },
       { value: 'clinident', label: 'Groupe Clinident' },
-      { value: 'adent_dental', label: 'Adent Dental' },
       { value: 'pure_clinic', label: 'Pure Clinic' },
       { value: 'dentalgroup', label: 'Dentalgroup.ch' },
       { value: 'urbadental', label: 'Urbadental' },

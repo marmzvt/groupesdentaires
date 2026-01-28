@@ -72,9 +72,9 @@ const q2Labels: Record<string, string> = {
 
 const segmentLabels: Record<string, string> = {
   preventifs: 'Soins préventifs',
-  hygiene: 'Hygiène de base',
+  hygiene: 'Soins de base',
   protheses: 'Prothèses',
-  implants: 'Implants',
+  implants: 'Implants/parodontie',
   orthodontie: 'Orthodontie/esthétiques',
 };
 

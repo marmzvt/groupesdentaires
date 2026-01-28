@@ -89,24 +89,24 @@ const templateHeaders = [
   'Q16_5(when none group): Perceived disadvantage_Standardisation des pratiques',
   'Q16_6(when none group): Perceived disadvantage_Je n\'ai pas de réticences',
   'Q17_1: High level of activity in Soins préventifs',
-  'Q17_2: High level of activity in Soins d\'hygiène de base',
+  'Q17_2: High level of activity in Soins de base (restauration, endo, extractions, ...)',
   'Q17_3: High level of activity in Prothèses fixes et amovibles',
-  'Q17_4: High level of activity in Implants',
+  'Q17_4: High level of activity in Implants et parodontie',
   'Q17_5: High level of activity in Orthodontie et soins esthétiques',
   'Q18_1: % activity in Soins préventifs',
-  'Q18_2: % activity in Soins d\'hygiène de base',
+  'Q18_2: % activity in Soins de base (restauration, endo, extractions, ...)',
   'Q18_3: % activity in Prothèses fixes et amovibles',
-  'Q18_4: % activity in Implants',
+  'Q18_4: % activity in Implants et parodontie',
   'Q18_5: % activity in Orthodontie et soins esthétiques',
   'Q19_1: High level of activity in Soins préventifs (N5Y)',
-  'Q19_2: High level of activity in Soins d\'hygiène de base (N5Y)',
+  'Q19_2: High level of activity in Soins de base (restauration, endo, extractions, ...) (N5Y)',
   'Q19_3: High level of activity in Prothèses fixes et amovibles (N5Y)',
-  'Q19_4: High level of activity in Implants (N5Y)',
+  'Q19_4: High level of activity in Implants et parodontie (N5Y)',
   'Q19_5: High level of activity in Orthodontie et soins esthétiques (N5Y)',
   'Q20_1: % activity in Soins préventifs (N5Y)',
-  'Q20_2: % activity in Soins d\'hygiène de base (N5Y)',
+  'Q20_2: % activity in Soins de base (restauration, endo, extractions, ...) (N5Y)',
   'Q20_3: % activity in Prothèses fixes et amovibles (N5Y)',
-  'Q20_4: % activity in Implants (N5Y)',
+  'Q20_4: % activity in Implants et parodontie (N5Y)',
   'Q20_5: % activity in Orthodontie et soins esthétiques (N5Y)',
   'Q21 (For groups): Name of your current group',
   'Q22: Can we contact you',
@@ -508,9 +508,9 @@ function createAnalysisSheetFR(workbook: ExcelJS.Workbook) {
 
   const activitySegments = [
     { name: 'Soins préventifs', col: 'AN' },
-    { name: 'Hygiène de base', col: 'AO' },
+    { name: 'Soins de base', col: 'AO' },
     { name: 'Prothèses fixes et amovibles', col: 'AP' },
-    { name: 'Implants', col: 'AQ' },
+    { name: 'Implants et parodontie', col: 'AQ' },
     { name: 'Orthodontie et soins esthétiques', col: 'AR' },
   ];
 
@@ -535,9 +535,9 @@ function createAnalysisSheetFR(workbook: ExcelJS.Workbook) {
 
   const futureActivitySegments = [
     { name: 'Soins préventifs', currentCol: 'AN', futureCol: 'AX' },
-    { name: 'Hygiène de base', currentCol: 'AO', futureCol: 'AY' },
+    { name: 'Soins de base', currentCol: 'AO', futureCol: 'AY' },
     { name: 'Prothèses fixes et amovibles', currentCol: 'AP', futureCol: 'AZ' },
-    { name: 'Implants', currentCol: 'AQ', futureCol: 'BA' },
+    { name: 'Implants et parodontie', currentCol: 'AQ', futureCol: 'BA' },
     { name: 'Orthodontie et soins esthétiques', currentCol: 'AR', futureCol: 'BB' },
   ];
 
@@ -854,9 +854,9 @@ function createAnalysisSheetEN(workbook: ExcelJS.Workbook) {
 
   const activitySegmentsEN = [
     { name: 'Preventive care', col: 'AN' },
-    { name: 'Basic hygiene', col: 'AO' },
+    { name: 'Basic care (restoration, endo, extractions)', col: 'AO' },
     { name: 'Fixed and removable prosthetics', col: 'AP' },
-    { name: 'Implants', col: 'AQ' },
+    { name: 'Implants and periodontics', col: 'AQ' },
     { name: 'Orthodontics and aesthetic care', col: 'AR' },
   ];
 
@@ -881,9 +881,9 @@ function createAnalysisSheetEN(workbook: ExcelJS.Workbook) {
 
   const futureActivitySegmentsEN = [
     { name: 'Preventive care', currentCol: 'AN', futureCol: 'AX' },
-    { name: 'Basic hygiene', currentCol: 'AO', futureCol: 'AY' },
+    { name: 'Basic care (restoration, endo, extractions)', currentCol: 'AO', futureCol: 'AY' },
     { name: 'Fixed and removable prosthetics', currentCol: 'AP', futureCol: 'AZ' },
-    { name: 'Implants', currentCol: 'AQ', futureCol: 'BA' },
+    { name: 'Implants and periodontics', currentCol: 'AQ', futureCol: 'BA' },
     { name: 'Orthodontics and aesthetic care', currentCol: 'AR', futureCol: 'BB' },
   ];
 

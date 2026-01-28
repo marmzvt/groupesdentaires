@@ -506,9 +506,9 @@ function ActivityTab({ data }: { data: AnalysisData }) {
   const segments = data.activityAnalysis?.segments || [];
   const segmentLabels: Record<string, string> = {
     preventifs: 'Soins préventifs',
-    hygiene: 'Hygiène de base',
+    hygiene: 'Soins de base',
     protheses: 'Prothèses',
-    implants: 'Implants',
+    implants: 'Implants/parodontie',
     orthodontie: 'Orthodontie/Esthétique',
   };
 

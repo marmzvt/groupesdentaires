@@ -17,9 +17,9 @@ const optionLabels: Record<string, Record<string | number, string>> = {
   },
   segments: {
     preventifs: 'Soins préventifs',
-    hygiene: 'Soins d\'hygiène de base',
+    hygiene: 'Soins de base (restauration, endo, extractions, ...)',
     protheses: 'Prothèses fixes et amovibles',
-    implants: 'Implants',
+    implants: 'Implants et parodontie',
     orthodontie: 'Orthodontie et soins esthétiques',
   },
 };

@@ -31,9 +31,9 @@ export interface Question {
 // Activity segments for percentage distribution questions
 const activitySegments: Option[] = [
   { value: 'preventifs', label: 'Soins préventifs' },
-  { value: 'hygiene', label: 'Soins d\'hygiène de base' },
+  { value: 'hygiene', label: 'Soins de base (restauration, endo, extractions, ...)' },
   { value: 'protheses', label: 'Prothèses fixes et amovibles' },
-  { value: 'implants', label: 'Implants' },
+  { value: 'implants', label: 'Implants et parodontie' },
   { value: 'orthodontie', label: 'Orthodontie et soins esthétiques' },
 ];
 

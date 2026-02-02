@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Question, sectionTitles } from '@/lib/questions';
+import { Question, sectionTitles, getQuestionText } from '@/lib/questions';
 import {
   SingleChoice,
   MultipleChoice,
@@ -17,6 +17,7 @@ interface QuestionCardProps {
   onChange: (value: any) => void;
   onAutoAdvance?: () => void;
   direction: number;
+  practiceType?: string;
 }
 
 export default function QuestionCard({
@@ -25,7 +26,10 @@ export default function QuestionCard({
   onChange,
   onAutoAdvance,
   direction,
+  practiceType,
 }: QuestionCardProps) {
+  // Get dynamic question text based on practice type (for Q5-Q9 wording adaptation)
+  const questionText = getQuestionText(question, practiceType);
   const variants = {
     enter: (direction: number) => ({
       x: direction > 0 ? 100 : -100,
@@ -139,7 +143,7 @@ export default function QuestionCard({
         </div>
 
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-          {question.question}
+          {questionText}
           {question.required && <span className="text-red-500 ml-1">*</span>}
         </h2>
 

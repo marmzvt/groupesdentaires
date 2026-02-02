@@ -4,404 +4,399 @@ const {
   Paragraph,
   TextRun,
   HeadingLevel,
-  Table,
-  TableRow,
-  TableCell,
-  WidthType,
-  BorderStyle,
   AlignmentType,
 } = require("docx");
 const fs = require("fs");
 
-// Survey structure translated to English
+// Survey structure in French
 const surveyStructure = {
-  title: "Dental Groups Survey - Questionnaire Structure",
-  subtitle: "Survey for Swiss Dental Practitioners",
+  title: "Enquête Groupes Dentaires - Structure du Questionnaire",
+  subtitle: "Enquête auprès des praticiens dentaires suisses",
 
   questionTypes: [
-    { type: "single", description: "Single choice (radio buttons)" },
-    { type: "multiple", description: "Multiple choice (checkboxes)" },
-    { type: "multiple_exclusive", description: "Multiple choice with exclusive option" },
-    { type: "numeric", description: "Numeric input" },
-    { type: "text", description: "Free text input" },
-    { type: "scale", description: "Scale slider (0-10)" },
-    { type: "percentage_distribution", description: "Percentage distribution (must total 100%)" },
+    { type: "single", description: "Choix unique (boutons radio)" },
+    { type: "multiple", description: "Choix multiple (cases à cocher)" },
+    { type: "multiple_exclusive", description: "Choix multiple avec option exclusive" },
+    { type: "numeric", description: "Saisie numérique" },
+    { type: "text", description: "Saisie de texte libre" },
+    { type: "scale", description: "Curseur d'échelle (0-10)" },
+    { type: "percentage_distribution", description: "Répartition en pourcentage (total = 100%)" },
   ],
 
   sections: [
     {
       id: "0",
-      title: "Practice Type",
-      description: "Routing question to determine respondent branch",
+      title: "Type de structure",
+      description: "Question de routage pour déterminer la branche du répondant",
     },
     {
       id: "A",
-      title: "Profile",
-      description: "Professional background and experience",
+      title: "Profil",
+      description: "Parcours professionnel et expérience",
     },
     {
       id: "B",
-      title: "Practice Evaluation",
-      description: "Assessment of current practice structure (different questions for group vs. independent dentists)",
+      title: "Évaluation de la structure",
+      description: "Évaluation de la structure de pratique actuelle (questions différentes pour groupes vs indépendants)",
     },
     {
       id: "B2",
-      title: "Perception of Dental Groups",
-      description: "Views on dental groups (independent dentists only)",
+      title: "Perception des groupes dentaires",
+      description: "Avis sur les groupes dentaires (dentistes indépendants uniquement)",
     },
     {
       id: "C",
-      title: "Activity Segments",
-      description: "Current and anticipated activity distribution",
+      title: "Segments d'activité",
+      description: "Répartition actuelle et anticipée de l'activité",
     },
     {
       id: "D",
-      title: "Additional Information",
-      description: "Organizational affiliation and contact details",
+      title: "Informations complémentaires",
+      description: "Affiliation organisationnelle et coordonnées",
     },
   ],
 
   activitySegments: [
-    { value: "preventifs", label: "Preventive care by dental hygienist" },
-    { value: "conservateurs", label: "Basic conservative care (restoration, endo, extractions, ...)" },
-    { value: "protheses", label: "Fixed and removable dentures" },
-    { value: "implants", label: "Implants and oral surgery" },
-    { value: "parodontologie", label: "Periodontology" },
-    { value: "orthodontie", label: "Interceptive orthodontics and/or aligners" },
-    { value: "esthetique", label: "Aesthetic treatments" },
+    { value: "preventifs", label: "Soins preventifs par l'HD" },
+    { value: "conservateurs", label: "Soins de base conservateurs (restauration, endo, extractions, ...)" },
+    { value: "protheses", label: "Protheses fixes et amovibles" },
+    { value: "implants", label: "Implants et chirurgie orale" },
+    { value: "parodontologie", label: "Parodontologie" },
+    { value: "orthodontie", label: "Orthodontie interceptive et/ou par aligneurs" },
+    { value: "esthetique", label: "Traitements a but esthetique" },
   ],
 
   questions: [
-    // SECTION 0 - Routing Question
+    // SECTION 0 - Question de routage
     {
       id: "Q0",
       section: "0",
       type: "single",
-      question: "In what type of structure do you currently practice?",
+      question: "Dans quel type de structure exercez-vous actuellement ?",
       required: true,
-      showCondition: "All respondents",
+      showCondition: "Tous les répondants",
       options: [
-        { value: "A", label: "Dental group (center or network of practices)" },
-        { value: "B", label: "Independent solo practice" },
-        { value: "C", label: "Group practice with independent practitioners (multiple practitioners)" },
+        { value: "A", label: "Groupe dentaire (centre ou reseau de cabinets)" },
+        { value: "B", label: "Cabinet individuel independant" },
+        { value: "C", label: "Cabinet de groupe avec praticiens independants (plusieurs praticiens)" },
       ],
     },
 
-    // SECTION A - Profile
+    // SECTION A - Profil
     {
       id: "Q1",
       section: "A",
       type: "numeric",
-      question: "In what year did you start practicing as a dentist?",
+      question: "En quelle année avez-vous commencé à exercer en tant que médecin-dentiste ?",
       required: true,
-      showCondition: "All respondents",
-      validation: "Range: 1960-2025",
-      placeholder: "Example: 2010",
+      showCondition: "Tous les répondants",
+      validation: "Plage : 1960-2025",
+      placeholder: "Ex: 2010",
     },
     {
       id: "Q2",
       section: "A",
       type: "multiple_exclusive",
-      question: "What mode(s) of practice have you experienced during your career?",
-      subtitle: "Select all applicable answers",
+      question: "Quel(s) mode(s) d'exercice avez-vous pratiqué(s) au cours de votre carrière ?",
+      subtitle: "Sélectionnez toutes les réponses applicables",
       required: true,
-      showCondition: "All respondents",
+      showCondition: "Tous les répondants",
       options: [
-        { value: "A", label: "Independent solo practice - partner/founder" },
-        { value: "B", label: "Independent group practice (multiple practitioners) - partner/founder" },
-        { value: "C", label: "Employee in a private practice" },
-        { value: "D", label: "Employee in a dental center or group" },
-        { value: "E", label: "Other mode of practice (e.g., hospital, university)" },
-        { value: "F", label: "This is my first professional experience", exclusive: true },
+        { value: "A", label: "Cabinet individuel indépendant - associé / fondateur" },
+        { value: "B", label: "Cabinet de groupe indépendant (plusieurs praticiens) - associé / fondateur" },
+        { value: "C", label: "Salarié(e) dans un cabinet privé" },
+        { value: "D", label: "Salarié(e) dans un centre ou groupe dentaire" },
+        { value: "E", label: "Autre mode d'exercice (p. ex. hôpital, université)" },
+        { value: "F", label: "C'est ma première expérience professionnelle", exclusive: true },
       ],
     },
     {
       id: "Q3",
       section: "A",
       type: "numeric",
-      question: "How long have you been affiliated with your current structure?",
+      question: "Depuis combien de temps êtes-vous affilié(e) à votre structure actuelle ?",
       required: true,
-      showCondition: "All respondents",
-      validation: "Range: 0-50 years",
-      unit: "years",
-      placeholder: "Example: 3",
+      showCondition: "Tous les répondants",
+      validation: "Plage : 0-50 ans",
+      unit: "années",
+      placeholder: "Ex: 3",
     },
 
-    // SECTION B - Group Dentists (Q4-Q13)
+    // SECTION B - Dentistes en groupe (Q4-Q13)
     {
       id: "Q4",
       section: "B",
       type: "scale",
-      question: "How do you rate the effectiveness of administrative and operational support (e.g., billing, scheduling) in reducing your workload?",
+      question: "Comment évaluez-vous l'efficacité du soutien administratif et opérationnel (par exemple, facturation, planification) dans la réduction de votre charge de travail ?",
       required: true,
-      showCondition: "Group dentists only (Q0 = A)",
-      scaleLabels: { min: "Very ineffective", max: "Very effective" },
+      showCondition: "Dentistes en groupe uniquement (Q0 = A)",
+      scaleLabels: { min: "Très inefficace", max: "Très efficace" },
     },
     {
       id: "Q5",
       section: "B",
       type: "scale",
-      question: "To what extent do you think your affiliation with a dental group contributes to your professional development?",
+      question: "Dans quelle mesure pensez-vous que votre affiliation à un groupe dentaire contribue à votre développement professionnel ?",
       required: true,
-      showCondition: "Group dentists only (Q0 = A)",
-      scaleLabels: { min: "Not at all", max: "Enormously" },
+      showCondition: "Dentistes en groupe uniquement (Q0 = A)",
+      scaleLabels: { min: "Pas du tout", max: "Énormément" },
     },
     {
       id: "Q6",
       section: "B",
       type: "scale",
-      question: "How do you rate your satisfaction with access to continuing education offered by the dental group?",
+      question: "Comment évaluez-vous votre satisfaction concernant l'accès à la formation continue offert par le groupe dentaire ?",
       required: true,
-      showCondition: "Group dentists only (Q0 = A)",
-      scaleLabels: { min: "Not at all satisfied", max: "Very satisfied" },
+      showCondition: "Dentistes en groupe uniquement (Q0 = A)",
+      scaleLabels: { min: "Pas du tout satisfait", max: "Très satisfait" },
     },
     {
       id: "Q7",
       section: "B",
       type: "scale",
-      question: "How do you rate your satisfaction with access to technologies and dental materials in your structure?",
-      subtitle: "Leave blank if no opinion and click next",
+      question: "Comment évaluez-vous votre satisfaction concernant l'accès aux technologies et aux matériaux dentaires dans votre structure ?",
+      subtitle: "Laisser vide si pas d'avis et cliquer sur suivant",
       required: false,
-      showCondition: "Group dentists only (Q0 = A)",
-      scaleLabels: { min: "Not at all satisfied", max: "Very satisfied" },
+      showCondition: "Dentistes en groupe uniquement (Q0 = A)",
+      scaleLabels: { min: "Pas du tout satisfait", max: "Très satisfait" },
     },
     {
       id: "Q8",
       section: "B",
       type: "scale",
-      question: "To what extent does the dental group contribute to the quality of your care / clinical quality?",
+      question: "Dans quelle mesure le groupe dentaire contribue-t-il à la qualité de vos soins / qualité clinique ?",
       required: true,
-      showCondition: "Group dentists only (Q0 = A)",
-      scaleLabels: { min: "Not at all", max: "Enormously" },
+      showCondition: "Dentistes en groupe uniquement (Q0 = A)",
+      scaleLabels: { min: "Pas du tout", max: "Énormément" },
     },
     {
       id: "Q9",
       section: "B",
       type: "scale",
-      question: "To what extent do you benefit from having colleagues on-site to manage your clinical cases?",
+      question: "Dans quelle mesure bénéficiez-vous de la présence de confrères sur place pour gérer vos cas cliniques ?",
       required: true,
-      showCondition: "Group dentists only (Q0 = A)",
-      scaleLabels: { min: "Not at all", max: "Enormously" },
+      showCondition: "Dentistes en groupe uniquement (Q0 = A)",
+      scaleLabels: { min: "Pas du tout", max: "Énormément" },
     },
     {
       id: "Q10",
       section: "B",
       type: "scale",
-      question: "If you have previously worked in independent practice, do you think patient satisfaction is higher in your current structure?",
-      subtitle: "Leave blank if no opinion and click next",
+      question: "Si vous avez travaillé auparavant en pratique indépendante, estimez-vous que la satisfaction des patients est plus élevée dans votre structure actuelle ?",
+      subtitle: "Laisser vide si pas d'avis et cliquer sur suivant",
       required: false,
-      showCondition: "Group dentists with prior independent experience (Q0 = A AND Q2 includes A or B)",
-      scaleLabels: { min: "Much less satisfied", max: "Much more satisfied" },
+      showCondition: "Dentistes en groupe avec expérience indépendante antérieure (Q0 = A ET Q2 inclut A ou B)",
+      scaleLabels: { min: "Bien moins satisfaits", max: "Bien plus satisfaits" },
     },
     {
       id: "Q11",
       section: "B",
       type: "scale",
-      question: "How do you rate your level of safety regarding occupational hazards (blood exposure accidents, splashes, materials, aggression, ...)?",
+      question: "Comment évaluez-vous votre niveau de sécurité vis-à-vis des risques professionnels (accidents exposition au sang, projections, matériaux, agressions, ...) ?",
       required: true,
-      showCondition: "Group dentists only (Q0 = A)",
-      scaleLabels: { min: "Very exposed", max: "Very protected" },
+      showCondition: "Dentistes en groupe uniquement (Q0 = A)",
+      scaleLabels: { min: "Très exposé", max: "Très protégé" },
     },
     {
       id: "Q12",
       section: "B",
       type: "scale",
-      question: "Do you think working within a dental group allows for a better work-life balance?",
-      subtitle: "Leave blank if no opinion and click next",
+      question: "Pensez-vous que le travail au sein d'un groupe dentaire permet un meilleur équilibre personnel-professionnel ?",
+      subtitle: "Laisser vide si pas d'avis et cliquer sur suivant",
       required: false,
-      showCondition: "Group dentists only (Q0 = A)",
-      scaleLabels: { min: "Not at all", max: "Enormously" },
+      showCondition: "Dentistes en groupe uniquement (Q0 = A)",
+      scaleLabels: { min: "Pas du tout", max: "Énormément" },
     },
     {
       id: "Q13",
       section: "B",
       type: "scale",
-      question: "Are you satisfied working within a dental group?",
+      question: "Êtes-vous satisfait de travailler au sein d'un groupe dentaire ?",
       required: true,
-      showCondition: "Group dentists only (Q0 = A)",
-      scaleLabels: { min: "Not at all satisfied", max: "Very satisfied" },
+      showCondition: "Dentistes en groupe uniquement (Q0 = A)",
+      scaleLabels: { min: "Pas du tout satisfait", max: "Très satisfait" },
     },
 
-    // SECTION B - Independent Dentists (Q4i-Q12i)
+    // SECTION B - Dentistes indépendants (Q4i-Q12i)
     {
       id: "Q4i",
       section: "B",
       type: "scale",
-      question: "How do you rate the effectiveness of your administrative and operational management (billing, scheduling)?",
+      question: "Comment évaluez-vous l'efficacité de votre gestion administrative et opérationnelle (facturation, planification) ?",
       required: true,
-      showCondition: "Independent dentists only (Q0 = B or C)",
-      scaleLabels: { min: "Very ineffective", max: "Very effective" },
+      showCondition: "Dentistes indépendants uniquement (Q0 = B ou C)",
+      scaleLabels: { min: "Très inefficace", max: "Très efficace" },
     },
     {
       id: "Q5i",
       section: "B",
       type: "scale",
-      question: "To what extent does your current mode of practice contribute to your professional development?",
+      question: "Dans quelle mesure votre mode d'exercice actuel contribue-t-il à votre développement professionnel ?",
       required: true,
-      showCondition: "Independent dentists only (Q0 = B or C)",
-      scaleLabels: { min: "Not at all", max: "Enormously" },
+      showCondition: "Dentistes indépendants uniquement (Q0 = B ou C)",
+      scaleLabels: { min: "Pas du tout", max: "Énormément" },
     },
     {
       id: "Q6i",
       section: "B",
       type: "scale",
-      question: "How do you rate your satisfaction with access to continuing education?",
+      question: "Comment évaluez-vous votre satisfaction concernant l'accès à la formation continue ?",
       required: true,
-      showCondition: "Independent dentists only (Q0 = B or C)",
-      scaleLabels: { min: "Not at all satisfied", max: "Very satisfied" },
+      showCondition: "Dentistes indépendants uniquement (Q0 = B ou C)",
+      scaleLabels: { min: "Pas du tout satisfait", max: "Très satisfait" },
     },
     {
       id: "Q7i",
       section: "B",
       type: "scale",
-      question: "How do you rate your satisfaction with access to technologies and dental materials in your structure?",
-      subtitle: "Leave blank if no opinion and click next",
+      question: "Comment évaluez-vous votre satisfaction concernant l'accès aux technologies et aux matériaux dentaires dans votre structure ?",
+      subtitle: "Laisser vide si pas d'avis et cliquer sur suivant",
       required: false,
-      showCondition: "Independent dentists only (Q0 = B or C)",
-      scaleLabels: { min: "Not at all satisfied", max: "Very satisfied" },
+      showCondition: "Dentistes indépendants uniquement (Q0 = B ou C)",
+      scaleLabels: { min: "Pas du tout satisfait", max: "Très satisfait" },
     },
     {
       id: "Q8i",
       section: "B",
       type: "scale",
-      question: "To what extent does your mode of practice contribute to the quality of your care / clinical quality?",
+      question: "Dans quelle mesure votre mode d'exercice contribue-t-il à la qualité de vos soins / qualité clinique ?",
       required: true,
-      showCondition: "Independent dentists only (Q0 = B or C)",
-      scaleLabels: { min: "Not at all", max: "Enormously" },
+      showCondition: "Dentistes indépendants uniquement (Q0 = B ou C)",
+      scaleLabels: { min: "Pas du tout", max: "Énormément" },
     },
     {
       id: "Q9i",
       section: "B",
       type: "scale",
-      question: "To what extent do you have access to colleagues to discuss or manage your clinical cases?",
+      question: "Dans quelle mesure avez-vous accès à des confrères pour discuter ou gérer vos cas cliniques ?",
       required: true,
-      showCondition: "Independent dentists only (Q0 = B or C)",
-      scaleLabels: { min: "Not at all", max: "Enormously" },
+      showCondition: "Dentistes indépendants uniquement (Q0 = B ou C)",
+      scaleLabels: { min: "Pas du tout", max: "Énormément" },
     },
     {
       id: "Q10i",
       section: "B",
       type: "scale",
-      question: "How do you rate your level of safety regarding occupational hazards (blood exposure accidents, splashes, materials, aggression, ...)?",
+      question: "Comment évaluez-vous votre niveau de sécurité vis-à-vis des risques professionnels (accidents exposition au sang, projections, matériaux, agressions, ...) ?",
       required: true,
-      showCondition: "Independent dentists only (Q0 = B or C)",
-      scaleLabels: { min: "Very exposed", max: "Very protected" },
+      showCondition: "Dentistes indépendants uniquement (Q0 = B ou C)",
+      scaleLabels: { min: "Très exposé", max: "Très protégé" },
     },
     {
       id: "Q11i",
       section: "B",
       type: "scale",
-      question: "Do you think your current mode of practice allows for a good work-life balance?",
-      subtitle: "Leave blank if no opinion and click next",
+      question: "Pensez-vous que votre mode d'exercice actuel permet un bon équilibre personnel-professionnel ?",
+      subtitle: "Laisser vide si pas d'avis et cliquer sur suivant",
       required: false,
-      showCondition: "Independent dentists only (Q0 = B or C)",
-      scaleLabels: { min: "Not at all", max: "Enormously" },
+      showCondition: "Dentistes indépendants uniquement (Q0 = B ou C)",
+      scaleLabels: { min: "Pas du tout", max: "Énormément" },
     },
     {
       id: "Q12i",
       section: "B",
       type: "scale",
-      question: "Are you satisfied with your current mode of practice?",
+      question: "Êtes-vous satisfait de votre mode d'exercice actuel ?",
       required: true,
-      showCondition: "Independent dentists only (Q0 = B or C)",
-      scaleLabels: { min: "Not at all satisfied", max: "Very satisfied" },
+      showCondition: "Dentistes indépendants uniquement (Q0 = B ou C)",
+      scaleLabels: { min: "Pas du tout satisfait", max: "Très satisfait" },
     },
 
-    // SECTION B2 - Perception (Independent only)
+    // SECTION B2 - Perception (Indépendants uniquement)
     {
       id: "Q20",
       section: "B2",
       type: "single",
-      question: "Do you plan to join a dental group in the next 5 years?",
+      question: "Envisagez-vous de rejoindre un groupe dentaire dans les 5 prochaines années ?",
       required: true,
-      showCondition: "Independent dentists only (Q0 = B or C)",
+      showCondition: "Dentistes indépendants uniquement (Q0 = B ou C)",
       options: [
-        { value: "A", label: "Yes, definitely" },
-        { value: "B", label: "Yes, perhaps" },
-        { value: "C", label: "No, probably not" },
-        { value: "D", label: "No, definitely not" },
+        { value: "A", label: "Oui, certainement" },
+        { value: "B", label: "Oui, peut-être" },
+        { value: "C", label: "Non, probablement pas" },
+        { value: "D", label: "Non, certainement pas" },
       ],
     },
     {
       id: "Q21",
       section: "B2",
       type: "multiple_exclusive",
-      question: "What advantages do you perceive in dental groups?",
-      subtitle: "Select all applicable answers",
+      question: "Quels avantages percevez-vous dans les groupes dentaires ?",
+      subtitle: "Selectionnez toutes les reponses applicables",
       required: true,
-      showCondition: "Independent dentists only (Q0 = B or C)",
+      showCondition: "Dentistes independants uniquement (Q0 = B ou C)",
       options: [
-        { value: "A", label: "Administrative support" },
-        { value: "B", label: "Access to advanced technologies" },
-        { value: "C", label: "Collaboration with colleagues" },
-        { value: "D", label: "Facilitated continuing education" },
-        { value: "E", label: "Better work-life balance" },
-        { value: "F", label: "Financial security" },
-        { value: "G", label: "I do not perceive any advantages", exclusive: true },
-        { value: "H", label: "Better retirement planning" },
-        { value: "I", label: "Easier patient succession/transfer" },
-        { value: "J", label: "Better security in case of illness" },
+        { value: "A", label: "Soutien administratif" },
+        { value: "B", label: "Acces a des technologies avancees" },
+        { value: "C", label: "Collaboration avec des confreres" },
+        { value: "D", label: "Formation continue facilitee" },
+        { value: "E", label: "Meilleur equilibre vie pro/perso" },
+        { value: "F", label: "Securite financiere" },
+        { value: "G", label: "Je ne percois pas d'avantages", exclusive: true },
+        { value: "H", label: "Meilleure planification de la retraite" },
+        { value: "I", label: "Transmission de la patientele (succession) facilitee" },
+        { value: "J", label: "Meilleure securite en cas de maladie" },
       ],
     },
     {
       id: "Q22",
       section: "B2",
       type: "multiple_exclusive",
-      question: "What are your main reluctances regarding dental groups?",
-      subtitle: "Select all applicable answers",
+      question: "Quelles sont vos principales reticences vis-a-vis des groupes dentaires ?",
+      subtitle: "Selectionnez toutes les reponses applicables",
       required: true,
-      showCondition: "Independent dentists only (Q0 = B or C)",
+      showCondition: "Dentistes independants uniquement (Q0 = B ou C)",
       options: [
-        { value: "A", label: "Loss of clinical autonomy" },
-        { value: "B", label: "Pressure on productivity" },
-        { value: "C", label: "Less advantageous compensation" },
-        { value: "D", label: "Less personal relationship with patients" },
-        { value: "E", label: "Standardization of practices" },
-        { value: "F", label: "I have no reluctances", exclusive: true },
-        { value: "J", label: "Being observed and evaluated on my work" },
+        { value: "A", label: "Perte d'autonomie clinique" },
+        { value: "B", label: "Pression sur la productivite" },
+        { value: "C", label: "Remuneration moins avantageuse" },
+        { value: "D", label: "Moins de relation personnelle avec les patients" },
+        { value: "E", label: "Standardisation des pratiques" },
+        { value: "F", label: "Je n'ai pas de reticences", exclusive: true },
+        { value: "J", label: "Le regard et evaluation de mon travail" },
       ],
     },
 
-    // SECTION C - Activity Segments
+    // SECTION C - Segments d'activité
     {
       id: "Q14",
       section: "C",
       type: "multiple",
-      question: "Today, in which segments do you observe the highest level of activity?",
-      subtitle: "Select all applicable segments (in terms of revenue)",
+      question: "Aujourd'hui, dans quels segments observez-vous le plus haut niveau d'activité ?",
+      subtitle: "Sélectionnez tous les segments concernés (en termes de chiffre d'affaires)",
       required: true,
-      showCondition: "All respondents",
-      options: "Activity Segments (see list above)",
+      showCondition: "Tous les répondants",
+      options: "Segments d'activité (voir liste ci-dessus)",
     },
     {
       id: "Q14b",
       section: "C",
       type: "percentage_distribution",
-      question: "How is your current activity distributed across these segments?",
-      subtitle: "Distribute 100% of your revenue across segments (total must equal 100%)",
+      question: "Comment se répartit votre activité actuelle entre ces segments ?",
+      subtitle: "Répartissez 100% de votre chiffre d'affaires entre les segments (le total doit être égal à 100%)",
       required: true,
-      showCondition: "All respondents",
-      options: "Activity Segments (see list above)",
+      showCondition: "Tous les répondants",
+      options: "Segments d'activité (voir liste ci-dessus)",
     },
     {
       id: "Q15",
       section: "C",
       type: "multiple",
-      question: "In which segments do you anticipate an increase in activity over the next 5 years?",
-      subtitle: "Select all applicable segments (in terms of revenue)",
+      question: "Dans quels segments anticipez-vous une augmentation de l'activité au cours des 5 prochaines années ?",
+      subtitle: "Sélectionnez tous les segments concernés (en termes de chiffre d'affaires)",
       required: true,
-      showCondition: "All respondents",
-      options: "Activity Segments (see list above)",
+      showCondition: "Tous les répondants",
+      options: "Segments d'activité (voir liste ci-dessus)",
     },
     {
       id: "Q15b",
       section: "C",
       type: "percentage_distribution",
-      question: "How do you anticipate the distribution of your activity in 5 years?",
-      subtitle: "Distribute 100% of your revenue across segments (total must equal 100%)",
+      question: "Comment anticipez-vous la répartition de votre activité dans 5 ans ?",
+      subtitle: "Répartissez 100% de votre chiffre d'affaires entre les segments (le total doit être égal à 100%)",
       required: true,
-      showCondition: "All respondents",
-      options: "Activity Segments (see list above)",
+      showCondition: "Tous les répondants",
+      options: "Segments d'activité (voir liste ci-dessus)",
     },
 
     // SECTION D - Contact
@@ -409,46 +404,46 @@ const surveyStructure = {
       id: "Q16",
       section: "D",
       type: "single",
-      question: "In which structure do you practice?",
+      question: "Dans quelle structure exercez-vous ?",
       required: true,
-      showCondition: "Group dentists only (Q0 = A)",
+      showCondition: "Dentistes en groupe uniquement (Q0 = A)",
       options: [
         { value: "white_cabinets", label: "White Cabinets Dentaires" },
         { value: "zahnarztzentrum", label: "Zahnarztzentrum.ch" },
         { value: "cheeze", label: "Cheeze" },
         { value: "ardentis", label: "Ardentis" },
-        { value: "chd", label: "CHD - Dental Hygiene Clinic" },
+        { value: "chd", label: "CHD – Clinique d'Hygiène Dentaire" },
         { value: "adent", label: "Adent" },
         { value: "panadent", label: "Panadent" },
         { value: "dentalys", label: "Dentalys" },
-        { value: "clinident", label: "Clinident Group" },
+        { value: "clinident", label: "Groupe Clinident" },
         { value: "pure_clinic", label: "Pure Clinic" },
         { value: "dentalgroup", label: "Dentalgroup.ch" },
         { value: "urbadental", label: "Urbadental" },
-        { value: "prefer_not_say", label: "I prefer not to say" },
-        { value: "other", label: "Other" },
+        { value: "prefer_not_say", label: "Je ne préfère pas dire" },
+        { value: "other", label: "Autre" },
       ],
     },
     {
       id: "Q17",
       section: "D",
       type: "single",
-      question: "In case of questions, do you allow us to contact you if we wish to follow up on these answers?",
+      question: "En cas de questions, nous permettez-vous de vous contacter si nous souhaitons approfondir avec vous ces réponses ?",
       required: true,
-      showCondition: "All respondents",
+      showCondition: "Tous les répondants",
       options: [
-        { value: "oui", label: "Yes" },
-        { value: "non", label: "No" },
+        { value: "oui", label: "Oui" },
+        { value: "non", label: "Non" },
       ],
     },
     {
       id: "Q18",
       section: "D",
       type: "text",
-      question: "What is your email address?",
-      placeholder: "example@email.com",
+      question: "Quelle est votre adresse email ?",
+      placeholder: "exemple@email.com",
       required: true,
-      showCondition: "Only if Q17 = Yes",
+      showCondition: "Uniquement si Q17 = Oui",
     },
   ],
 };
@@ -506,7 +501,7 @@ async function createDocument() {
           new Paragraph({
             children: [
               new TextRun({
-                text: "Table of Contents",
+                text: "Table des matières",
                 bold: true,
                 size: 32,
               }),
@@ -515,23 +510,23 @@ async function createDocument() {
             spacing: { before: 400, after: 200 },
           }),
           new Paragraph({
-            children: [new TextRun({ text: "1. Question Types", size: 24 })],
+            children: [new TextRun({ text: "1. Types de questions", size: 24 })],
             spacing: { after: 100 },
           }),
           new Paragraph({
-            children: [new TextRun({ text: "2. Survey Sections Overview", size: 24 })],
+            children: [new TextRun({ text: "2. Aperçu des sections", size: 24 })],
             spacing: { after: 100 },
           }),
           new Paragraph({
-            children: [new TextRun({ text: "3. Activity Segments Reference", size: 24 })],
+            children: [new TextRun({ text: "3. Référence des segments d'activité", size: 24 })],
             spacing: { after: 100 },
           }),
           new Paragraph({
-            children: [new TextRun({ text: "4. Complete Question List", size: 24 })],
+            children: [new TextRun({ text: "4. Liste complète des questions", size: 24 })],
             spacing: { after: 100 },
           }),
           new Paragraph({
-            children: [new TextRun({ text: "5. Survey Flow Logic", size: 24 })],
+            children: [new TextRun({ text: "5. Logique de flux du questionnaire", size: 24 })],
             spacing: { after: 400 },
           }),
 
@@ -539,7 +534,7 @@ async function createDocument() {
           new Paragraph({
             children: [
               new TextRun({
-                text: "1. Question Types",
+                text: "1. Types de questions",
                 bold: true,
                 size: 32,
               }),
@@ -564,7 +559,7 @@ async function createDocument() {
           new Paragraph({
             children: [
               new TextRun({
-                text: "2. Survey Sections Overview",
+                text: "2. Aperçu des sections",
                 bold: true,
                 size: 32,
               }),
@@ -600,7 +595,7 @@ async function createDocument() {
           new Paragraph({
             children: [
               new TextRun({
-                text: "3. Activity Segments Reference",
+                text: "3. Référence des segments d'activité",
                 bold: true,
                 size: 32,
               }),
@@ -611,7 +606,7 @@ async function createDocument() {
           new Paragraph({
             children: [
               new TextRun({
-                text: "These segments are used in the activity distribution questions (Q14, Q14b, Q15, Q15b):",
+                text: "Ces segments sont utilisés dans les questions de répartition d'activité (Q14, Q14b, Q15, Q15b) :",
                 size: 22,
               }),
             ],
@@ -632,7 +627,7 @@ async function createDocument() {
           new Paragraph({
             children: [
               new TextRun({
-                text: "4. Complete Question List",
+                text: "4. Liste complète des questions",
                 bold: true,
                 size: 32,
               }),
@@ -720,7 +715,7 @@ async function createDocument() {
                   new Paragraph({
                     children: [
                       new TextRun({
-                        text: `Show condition: `,
+                        text: `Condition d'affichage : `,
                         bold: true,
                         size: 20,
                       }),
@@ -739,7 +734,7 @@ async function createDocument() {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: `Scale: 0 (${q.scaleLabels.min}) to 10 (${q.scaleLabels.max})`,
+                          text: `Échelle : 0 (${q.scaleLabels.min}) à 10 (${q.scaleLabels.max})`,
                           size: 20,
                           color: "666666",
                         }),
@@ -754,7 +749,7 @@ async function createDocument() {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: `Validation: ${q.validation}`,
+                          text: `Validation : ${q.validation}`,
                           size: 20,
                           color: "666666",
                         }),
@@ -769,7 +764,7 @@ async function createDocument() {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: `Unit: ${q.unit}`,
+                          text: `Unité : ${q.unit}`,
                           size: 20,
                           color: "666666",
                         }),
@@ -784,7 +779,7 @@ async function createDocument() {
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Options:",
+                          text: "Options :",
                           bold: true,
                           size: 20,
                         }),
@@ -803,7 +798,7 @@ async function createDocument() {
                           }),
                           opt.exclusive
                             ? new TextRun({
-                                text: " (exclusive)",
+                                text: " (exclusif)",
                                 italics: true,
                                 size: 18,
                                 color: "999999",
@@ -815,12 +810,12 @@ async function createDocument() {
                       })
                     );
                   });
-                } else if (q.options === "Activity Segments (see list above)") {
+                } else if (q.options === "Segments d'activité (voir liste ci-dessus)") {
                   paragraphs.push(
                     new Paragraph({
                       children: [
                         new TextRun({
-                          text: "Options: Activity Segments (see Section 3)",
+                          text: "Options : Segments d'activité (voir Section 3)",
                           size: 20,
                           italics: true,
                         }),
@@ -846,7 +841,7 @@ async function createDocument() {
           new Paragraph({
             children: [
               new TextRun({
-                text: "5. Survey Flow Logic",
+                text: "5. Logique de flux du questionnaire",
                 bold: true,
                 size: 32,
               }),
@@ -858,7 +853,7 @@ async function createDocument() {
           new Paragraph({
             children: [
               new TextRun({
-                text: "The survey uses branching logic based on the respondent's practice type (Q0):",
+                text: "Le questionnaire utilise une logique de branchement basée sur le type de pratique du répondant (Q0) :",
                 size: 22,
               }),
             ],
@@ -868,7 +863,7 @@ async function createDocument() {
           new Paragraph({
             children: [
               new TextRun({
-                text: "Branch A: Group Dentists (Q0 = A)",
+                text: "Branche A : Dentistes en groupe (Q0 = A)",
                 bold: true,
                 size: 24,
                 color: "2E74B5",
@@ -879,7 +874,7 @@ async function createDocument() {
           new Paragraph({
             children: [
               new TextRun({
-                text: "Q0 → Q1 → Q2 → Q3 → Q4-Q13 → Q14 → Q14b → Q15 → Q15b → Q16 → Q17 → (Q18 if yes)",
+                text: "Q0 → Q1 → Q2 → Q3 → Q4-Q13 → Q14 → Q14b → Q15 → Q15b → Q16 → Q17 → (Q18 si oui)",
                 size: 20,
               }),
             ],
@@ -889,7 +884,7 @@ async function createDocument() {
           new Paragraph({
             children: [
               new TextRun({
-                text: "Note: Q10 only appears if Q2 includes options A or B (prior independent experience)",
+                text: "Note : Q10 n'apparaît que si Q2 inclut les options A ou B (expérience indépendante antérieure)",
                 italics: true,
                 size: 20,
                 color: "666666",
@@ -902,7 +897,7 @@ async function createDocument() {
           new Paragraph({
             children: [
               new TextRun({
-                text: "Branch B: Independent Dentists (Q0 = B or C)",
+                text: "Branche B : Dentistes indépendants (Q0 = B ou C)",
                 bold: true,
                 size: 24,
                 color: "2E74B5",
@@ -913,7 +908,7 @@ async function createDocument() {
           new Paragraph({
             children: [
               new TextRun({
-                text: "Q0 → Q1 → Q2 → Q3 → Q4i-Q12i → Q20 → Q21 → Q22 → Q14 → Q14b → Q15 → Q15b → Q17 → (Q18 if yes)",
+                text: "Q0 → Q1 → Q2 → Q3 → Q4i-Q12i → Q20 → Q21 → Q22 → Q14 → Q14b → Q15 → Q15b → Q17 → (Q18 si oui)",
                 size: 20,
               }),
             ],
@@ -923,7 +918,7 @@ async function createDocument() {
           new Paragraph({
             children: [
               new TextRun({
-                text: "Note: Independent dentists do NOT see Q16 (dental group selection)",
+                text: "Note : Les dentistes indépendants ne voient PAS Q16 (sélection du groupe dentaire)",
                 italics: true,
                 size: 20,
                 color: "666666",
@@ -937,7 +932,7 @@ async function createDocument() {
           new Paragraph({
             children: [
               new TextRun({
-                text: "Legend",
+                text: "Légende",
                 bold: true,
                 size: 24,
               }),
@@ -947,7 +942,7 @@ async function createDocument() {
           new Paragraph({
             children: [
               new TextRun({
-                text: "* Required question",
+                text: "* Question obligatoire",
                 size: 20,
               }),
             ],
@@ -957,7 +952,7 @@ async function createDocument() {
           new Paragraph({
             children: [
               new TextRun({
-                text: "(exclusive) - Selecting this option deselects all others",
+                text: "(exclusif) - Sélectionner cette option désélectionne toutes les autres",
                 size: 20,
               }),
             ],
@@ -971,8 +966,8 @@ async function createDocument() {
 
   // Generate and save the document
   const buffer = await Packer.toBuffer(doc);
-  fs.writeFileSync("Survey_Structure_English.docx", buffer);
-  console.log("Document created: Survey_Structure_English.docx");
+  fs.writeFileSync("Structure_Questionnaire_FR.docx", buffer);
+  console.log("Document créé : Structure_Questionnaire_FR.docx");
 }
 
 createDocument().catch(console.error);

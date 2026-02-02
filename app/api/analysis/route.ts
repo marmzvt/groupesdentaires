@@ -34,8 +34,8 @@ const compositeDefinitions = [
   { name: 'Personal Wellbeing', components: ['Q11', 'Q12'], indepComponents: ['Q10i', 'Q11i'] },
 ];
 
-// Activity segments
-const activitySegments = ['preventifs', 'hygiene', 'protheses', 'implants', 'orthodontie'];
+// Activity segments (v2: 7 segments)
+const activitySegments = ['preventifs', 'conservateurs', 'protheses', 'implants', 'parodontologie', 'orthodontie', 'esthetique'];
 
 export async function GET() {
   try {
@@ -209,10 +209,10 @@ function analyzeActivitySegments(groupResponses: any[], independentResponses: an
 function analyzePerceptions(independentResponses: any[]) {
   // Q20: Likelihood of joining
   const q20Counts: Record<string, number> = { A: 0, B: 0, C: 0, D: 0 };
-  // Q21: Perceived advantages
-  const q21Counts: Record<string, number> = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0 };
-  // Q22: Reluctances
-  const q22Counts: Record<string, number> = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0 };
+  // Q21: Perceived advantages (v2: 10 options)
+  const q21Counts: Record<string, number> = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0, H: 0, I: 0, J: 0 };
+  // Q22: Reluctances (v2: 7 options)
+  const q22Counts: Record<string, number> = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, J: 0 };
 
   for (const r of independentResponses) {
     if (r.Q20) q20Counts[r.Q20] = (q20Counts[r.Q20] || 0) + 1;
@@ -252,12 +252,15 @@ function analyzePerceptions(independentResponses: any[]) {
 function getAdvantageLabel(code: string): string {
   const labels: Record<string, string> = {
     A: 'Soutien administratif',
-    B: 'Technologies avancées',
-    C: 'Collaboration confrères',
+    B: 'Technologies avancees',
+    C: 'Collaboration confreres',
     D: 'Formation continue',
-    E: 'Équilibre vie pro/perso',
-    F: 'Sécurité financière',
-    G: 'Aucun avantage perçu',
+    E: 'Equilibre vie pro/perso',
+    F: 'Securite financiere',
+    G: 'Aucun avantage percu',
+    H: 'Planification retraite',
+    I: 'Transmission patientele',
+    J: 'Securite en cas de maladie',
   };
   return labels[code] || code;
 }
@@ -265,11 +268,12 @@ function getAdvantageLabel(code: string): string {
 function getReluctanceLabel(code: string): string {
   const labels: Record<string, string> = {
     A: 'Perte autonomie clinique',
-    B: 'Pression productivité',
-    C: 'Rémunération moins avantageuse',
+    B: 'Pression productivite',
+    C: 'Remuneration moins avantageuse',
     D: 'Relation patients',
     E: 'Standardisation pratiques',
-    F: 'Aucune réticence',
+    F: 'Aucune reticence',
+    J: 'Regard et evaluation du travail',
   };
   return labels[code] || code;
 }

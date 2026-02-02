@@ -13,6 +13,7 @@ function flattenResponse(response: any): Record<string, any> {
     id: response.id,
     createdAt: response.createdAt.toISOString(),
     completed: response.completed,
+    surveyVersion: response.surveyVersion || 1,
     structureName: response.structureName || '',
   };
 
@@ -43,7 +44,7 @@ function generateCSV(responses: any[]): string {
   if (responses.length === 0) return '';
 
   // Get all possible columns including percentage distribution sub-columns
-  const baseColumns = ['id', 'createdAt', 'completed', 'structureName'];
+  const baseColumns = ['id', 'createdAt', 'completed', 'surveyVersion', 'structureName'];
   const questionColumns: string[] = [];
 
   questions.forEach((q) => {
@@ -61,8 +62,9 @@ function generateCSV(responses: any[]): string {
   // Column headers with question text
   const headers = columns.map((col) => {
     if (col === 'id') return 'ID';
-    if (col === 'createdAt') return 'Date de création';
-    if (col === 'completed') return 'Complété';
+    if (col === 'createdAt') return 'Date de creation';
+    if (col === 'completed') return 'Complete';
+    if (col === 'surveyVersion') return 'Version';
     if (col === 'structureName') return 'Structure';
 
     // Handle percentage distribution sub-columns

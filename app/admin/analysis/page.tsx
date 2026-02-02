@@ -505,11 +505,13 @@ function ComparisonsTab({ data }: { data: AnalysisData }) {
 function ActivityTab({ data }: { data: AnalysisData }) {
   const segments = data.activityAnalysis?.segments || [];
   const segmentLabels: Record<string, string> = {
-    preventifs: 'Soins préventifs',
-    hygiene: 'Soins de base',
-    protheses: 'Prothèses',
-    implants: 'Implants/parodontie',
-    orthodontie: 'Orthodontie/Esthétique',
+    preventifs: 'Preventifs HD',
+    conservateurs: 'Soins de base',
+    protheses: 'Protheses',
+    implants: 'Implants/Chir.',
+    parodontologie: 'Parodontologie',
+    orthodontie: 'Orthodontie',
+    esthetique: 'Esthetique',
   };
 
   const currentData = segments.map((seg: string) => ({

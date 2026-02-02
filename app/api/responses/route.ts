@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
         startYear,
         affiliationYears,
         structureName,
+        surveyVersion: 2,  // v2: 7 segments, new Q21/Q22 options
       },
     });
 

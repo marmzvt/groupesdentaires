@@ -15,10 +15,12 @@ model Response {
   startYear        Int?
   affiliationYears Int?
   structureName    String?
+  surveyVersion    Int      @default(2)
 
   @@index([createdAt])
   @@index([completed])
   @@index([startYear])
+  @@index([surveyVersion])
 }
 
 model Admin {

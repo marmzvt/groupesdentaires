@@ -170,6 +170,7 @@ export default function SurveyContainer() {
           onChange={handleAnswerChange}
           onAutoAdvance={handleAutoAdvance}
           direction={direction}
+          practiceType={answers['Q0'] as string | undefined}
         />
       </main>
 

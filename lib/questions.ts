@@ -28,16 +28,27 @@ export interface Question {
   scaleLabels?: { min: string; max: string };
 }
 
-// Activity segments for percentage distribution questions
-const activitySegments: Option[] = [
-  { value: 'preventifs', label: 'Soins préventifs' },
-  { value: 'hygiene', label: 'Soins de base (restauration, endo, extractions, ...)' },
+// Activity segments for percentage distribution questions (v2: 7 segments)
+export const activitySegments: Option[] = [
+  { value: 'preventifs', label: 'Soins préventifs par l\'HD' },
+  { value: 'conservateurs', label: 'Soins de base conservateurs (restauration, endo, extractions, ...)' },
   { value: 'protheses', label: 'Prothèses fixes et amovibles' },
-  { value: 'implants', label: 'Implants et parodontie' },
-  { value: 'orthodontie', label: 'Orthodontie et soins esthétiques' },
+  { value: 'implants', label: 'Implants et chirurgie orale' },
+  { value: 'parodontologie', label: 'Parodontologie' },
+  { value: 'orthodontie', label: 'Orthodontie interceptive et/ou par aligneurs' },
+  { value: 'esthetique', label: 'Traitements à but esthétique' },
 ];
 
-// Options for Q21 - Perceived advantages of dental groups
+// Segment groupings for collapsible UI
+export const segmentGroups = [
+  { id: 'preventifs', label: 'Soins préventifs par l\'HD', segments: ['preventifs'] },
+  { id: 'conservateurs', label: 'Soins de base conservateurs', segments: ['conservateurs'] },
+  { id: 'protheses', label: 'Prothèses fixes et amovibles', segments: ['protheses'] },
+  { id: 'implants_paro', label: 'Implants, chirurgie orale et parodontologie', segments: ['implants', 'parodontologie'], collapsible: true },
+  { id: 'ortho_esth', label: 'Orthodontie et esthétique', segments: ['orthodontie', 'esthetique'], collapsible: true },
+];
+
+// Options for Q21 - Perceived advantages of dental groups (v2: 10 options)
 const perceivedAdvantages: Option[] = [
   { value: 'A', label: 'Soutien administratif' },
   { value: 'B', label: 'Accès à des technologies avancées' },
@@ -46,9 +57,12 @@ const perceivedAdvantages: Option[] = [
   { value: 'E', label: 'Meilleur équilibre vie pro/perso' },
   { value: 'F', label: 'Sécurité financière' },
   { value: 'G', label: 'Je ne perçois pas d\'avantages', exclusive: true },
+  { value: 'H', label: 'Meilleure planification de la retraite' },
+  { value: 'I', label: 'Transmission de la patientèle (succession) facilitée' },
+  { value: 'J', label: 'Meilleure sécurité en cas de maladie' },
 ];
 
-// Options for Q22 - Reluctances about dental groups
+// Options for Q22 - Reluctances about dental groups (v2: 7 options)
 const perceivedReluctances: Option[] = [
   { value: 'A', label: 'Perte d\'autonomie clinique' },
   { value: 'B', label: 'Pression sur la productivité' },
@@ -56,6 +70,7 @@ const perceivedReluctances: Option[] = [
   { value: 'D', label: 'Moins de relation personnelle avec les patients' },
   { value: 'E', label: 'Standardisation des pratiques' },
   { value: 'F', label: 'Je n\'ai pas de réticences', exclusive: true },
+  { value: 'J', label: 'Le regard et évaluation de mon travail' },
 ];
 
 export const questions: Question[] = [
@@ -69,7 +84,7 @@ export const questions: Question[] = [
     options: [
       { value: 'A', label: 'Groupe dentaire (centre ou réseau de cabinets)' },
       { value: 'B', label: 'Cabinet individuel indépendant' },
-      { value: 'C', label: 'Cabinet de groupe indépendant (plusieurs praticiens)' },
+      { value: 'C', label: 'Cabinet de groupe avec praticiens indépendants (plusieurs praticiens)' },
     ],
   },
 
@@ -445,15 +460,26 @@ export function getQuestionFlow(answers: Record<string, any>): Question[] {
 export function shouldShowQuestion(question: Question, answers: Record<string, any>): boolean {
   const practiceType = answers['Q0'] as string | undefined;
 
-  // Group dentist questions (Q4-Q13, Q16): Only show if Q0 = 'A'
-  const groupQuestions = ['Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q16'];
-  if (groupQuestions.includes(question.id)) {
+  // Group/practice questions (Q4-Q13): Show if Q0 = 'A' (dental group) OR Q0 = 'C' (group practice)
+  const groupPracticeQuestions = ['Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13'];
+  if (groupPracticeQuestions.includes(question.id)) {
+    if (practiceType !== 'A' && practiceType !== 'C') return false;
+  }
+
+  // Q16 (structure selection): Only show if Q0 = 'A' (dental groups only)
+  if (question.id === 'Q16') {
     if (practiceType !== 'A') return false;
   }
 
-  // Independent dentist questions (Q4i-Q12i, Q20-Q22): Only show if Q0 = 'B' or 'C'
-  const independentQuestions = ['Q4i', 'Q5i', 'Q6i', 'Q7i', 'Q8i', 'Q9i', 'Q10i', 'Q11i', 'Q12i', 'Q20', 'Q21', 'Q22'];
+  // Independent dentist questions (Q4i-Q12i): Only show if Q0 = 'B' (individual independent only)
+  const independentQuestions = ['Q4i', 'Q5i', 'Q6i', 'Q7i', 'Q8i', 'Q9i', 'Q10i', 'Q11i', 'Q12i'];
   if (independentQuestions.includes(question.id)) {
+    if (practiceType !== 'B') return false;
+  }
+
+  // Perception questions (Q20-Q22): Show if Q0 = 'B' or 'C' (independents only)
+  const perceptionQuestions = ['Q20', 'Q21', 'Q22'];
+  if (perceptionQuestions.includes(question.id)) {
     if (practiceType !== 'B' && practiceType !== 'C') return false;
   }
 
@@ -471,4 +497,64 @@ export function shouldShowQuestion(question: Question, answers: Record<string, a
   }
 
   return true;
+}
+
+// Get dynamic question text based on practice type (for Q5-Q9)
+export function getQuestionText(question: Question, practiceType: string | undefined): string {
+  // For Q0=C (cabinet de groupe), adapt wording to use "cabinet de groupe" instead of "groupe dentaire"
+  if (practiceType === 'C') {
+    const wordingMap: Record<string, string> = {
+      'Q5': 'Dans quelle mesure pensez-vous que votre appartenance à un cabinet de groupe contribue à votre développement professionnel ?',
+      'Q6': 'Comment évaluez-vous votre satisfaction concernant l\'accès à la formation continue au sein de votre cabinet de groupe ?',
+      'Q8': 'Dans quelle mesure le cabinet de groupe contribue-t-il à la qualité de vos soins / qualité clinique ?',
+      'Q12': 'Pensez-vous que le travail au sein d\'un cabinet de groupe permet un meilleur équilibre personnel-professionnel ?',
+      'Q13': 'Êtes-vous satisfait de travailler au sein d\'un cabinet de groupe ?',
+    };
+
+    if (wordingMap[question.id]) {
+      return wordingMap[question.id];
+    }
+  }
+
+  return question.question;
+}
+
+// Old segment keys for v1 data
+export const oldSegmentKeys = ['preventifs', 'hygiene', 'protheses', 'implants', 'orthodontie'];
+
+// New segment keys for v2 data
+export const newSegmentKeys = ['preventifs', 'conservateurs', 'protheses', 'implants', 'parodontologie', 'orthodontie', 'esthetique'];
+
+// Convert v1 segment data to v2 format (for exports)
+export function convertOldSegmentData(oldData: Record<string, number>): Record<string, number> {
+  return {
+    preventifs: oldData.preventifs || 0,
+    conservateurs: oldData.hygiene || 0,  // key rename: hygiene -> conservateurs
+    protheses: oldData.protheses || 0,
+    implants: (oldData.implants || 0) / 2,  // 50% split
+    parodontologie: (oldData.implants || 0) / 2,  // 50% split (new category)
+    orthodontie: (oldData.orthodontie || 0) / 2,  // 50% split
+    esthetique: (oldData.orthodontie || 0) / 2,  // 50% split (new category)
+  };
+}
+
+// Convert v1 segment selection array to v2 format (for multiple choice questions)
+export function convertOldSegmentSelection(oldSelection: string[]): string[] {
+  const newSelection: string[] = [];
+
+  oldSelection.forEach(seg => {
+    if (seg === 'preventifs') newSelection.push('preventifs');
+    else if (seg === 'hygiene') newSelection.push('conservateurs');
+    else if (seg === 'protheses') newSelection.push('protheses');
+    else if (seg === 'implants') {
+      newSelection.push('implants');
+      newSelection.push('parodontologie');
+    }
+    else if (seg === 'orthodontie') {
+      newSelection.push('orthodontie');
+      newSelection.push('esthetique');
+    }
+  });
+
+  return newSelection;
 }

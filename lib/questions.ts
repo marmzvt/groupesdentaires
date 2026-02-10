@@ -30,19 +30,19 @@ export interface Question {
 
 // Activity segments for percentage distribution questions (v2: 7 segments)
 export const activitySegments: Option[] = [
-  { value: 'preventifs', label: 'Soins préventifs par l\'HD' },
-  { value: 'conservateurs', label: 'Soins de base conservateurs (restauration, endo, extractions, ...)' },
+  { value: 'preventifs', label: 'Soins de diagnostic, de prévention ou urgence' },
+  { value: 'conservateurs', label: 'Soins conservateurs (restauration, endo, extractions, ...)' },
   { value: 'protheses', label: 'Prothèses fixes et amovibles' },
   { value: 'implants', label: 'Implants et chirurgie orale' },
   { value: 'parodontologie', label: 'Parodontologie' },
   { value: 'orthodontie', label: 'Orthodontie interceptive et/ou par aligneurs' },
-  { value: 'esthetique', label: 'Traitements à but esthétique' },
+  { value: 'esthetique', label: 'Soins électifs visant à améliorer l\'image de soin (blanchiments dentaires, alignements dentaires, facettes, bijoux, ...)' },
 ];
 
 // Segment groupings for collapsible UI
 export const segmentGroups = [
-  { id: 'preventifs', label: 'Soins préventifs par l\'HD', segments: ['preventifs'] },
-  { id: 'conservateurs', label: 'Soins de base conservateurs', segments: ['conservateurs'] },
+  { id: 'preventifs', label: 'Soins de diagnostic, de prévention ou urgence', segments: ['preventifs'] },
+  { id: 'conservateurs', label: 'Soins conservateurs', segments: ['conservateurs'] },
   { id: 'protheses', label: 'Prothèses fixes et amovibles', segments: ['protheses'] },
   { id: 'implants_paro', label: 'Implants, chirurgie orale et parodontologie', segments: ['implants', 'parodontologie'], collapsible: true },
   { id: 'ortho_esth', label: 'Orthodontie et esthétique', segments: ['orthodontie', 'esthetique'], collapsible: true },

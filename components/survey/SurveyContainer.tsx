@@ -7,9 +7,26 @@ import ProgressBar from './ProgressBar';
 import NavigationButtons from './NavigationButtons';
 import QuestionCard from './QuestionCard';
 
-export default function SurveyContainer() {
+interface SurveyContainerProps {
+  presetOrg?: string | null;
+}
+
+export default function SurveyContainer({ presetOrg }: SurveyContainerProps) {
   const router = useRouter();
-  const [answers, setAnswers] = useState<Record<string, any>>({});
+
+  // Determine if we're in Ardentis mode
+  const isArdentisMode = presetOrg === 'ardentis';
+
+  // Initialize answers state with pre-filled values for Ardentis
+  const [answers, setAnswers] = useState<Record<string, any>>(() => {
+    if (isArdentisMode) {
+      return {
+        Q0: 'A',         // Groupe dentaire
+        Q16: 'ardentis', // Structure name
+      };
+    }
+    return {};
+  });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,9 +35,15 @@ export default function SurveyContainer() {
   const questionFlow = getQuestionFlow(answers);
 
   // Filter questions that should be shown based on conditional logic
-  const visibleQuestions = questionFlow.filter((q) =>
-    shouldShowQuestion(q, answers)
-  );
+  const visibleQuestions = questionFlow
+    .filter((q) => shouldShowQuestion(q, answers))
+    .filter((q) => {
+      // Hide Q0 and Q16 for Ardentis pre-filled surveys
+      if (isArdentisMode && (q.id === 'Q0' || q.id === 'Q16')) {
+        return false;
+      }
+      return true;
+    });
 
   const currentQuestion = visibleQuestions[currentIndex];
   const totalQuestions = visibleQuestions.length;

@@ -103,9 +103,10 @@ export async function GET(request: NextRequest) {
         if (answer === undefined || answer === null) return;
         answeredCount++;
 
-        // Convert v1 segment data to v2 format for segment-related questions
+        // Convert v1 segment data to v2 format for segment-related questions (including hybrid v2-with-v1-data responses)
         const segmentQuestions = ['Q14', 'Q14b', 'Q15', 'Q15b'];
-        if (surveyVersion === 1 && segmentQuestions.includes(q.id)) {
+        const isV1Data = surveyVersion === 1 || (typeof answer === 'object' && answer !== null && 'hygiene' in answer);
+        if (isV1Data && segmentQuestions.includes(q.id)) {
           if (q.type === 'percentage' && typeof answer === 'object') {
             answer = convertOldSegmentData(answer);
           } else if (q.type === 'multiple' && Array.isArray(answer)) {

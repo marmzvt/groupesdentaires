@@ -61,8 +61,9 @@ export async function GET() {
       const data = response.data as Record<string, any>;
       const surveyVersion = response.surveyVersion || 1;
 
-      // Convert v1 segment data to v2 format
-      if (surveyVersion === 1) {
+      // Convert v1 segment data to v2 format (including hybrid v2-with-v1-data responses)
+      const hasV1SegmentData = data.Q14b && typeof data.Q14b === 'object' && 'hygiene' in data.Q14b;
+      if (surveyVersion === 1 || hasV1SegmentData) {
         // Convert percentage distributions (Q14b, Q15b)
         if (data.Q14b && typeof data.Q14b === 'object') {
           data.Q14b = convertOldSegmentData(data.Q14b);

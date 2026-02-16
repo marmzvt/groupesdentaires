@@ -25,8 +25,9 @@ function flattenResponse(response: any): Record<string, any> {
   questions.forEach((q) => {
     let value = data[q.id];
     if (value !== undefined) {
-      // Convert v1 segment data to v2 format
-      if (surveyVersion === 1 && segmentQuestions.includes(q.id)) {
+      // Convert v1 segment data to v2 format (including hybrid v2-with-v1-data responses)
+      const isV1Data = surveyVersion === 1 || (typeof value === 'object' && value !== null && 'hygiene' in value);
+      if (isV1Data && segmentQuestions.includes(q.id)) {
         if (q.type === 'percentage_distribution' && typeof value === 'object') {
           // Convert v1 percentage distribution to v2 format
           value = convertOldSegmentData(value);

@@ -577,9 +577,20 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
 
-    // Separate v1 and v2 responses
-    const v1Responses = responses.filter(r => (r.surveyVersion || 1) === 1);
-    const v2Responses = responses.filter(r => r.surveyVersion === 2);
+    // Separate by actual data format, not just version flag
+    const v1Responses = responses.filter(r => {
+      const version = r.surveyVersion || 1;
+      const data = r.data as any;
+      const hasV1Keys = data.Q14b && typeof data.Q14b === 'object' && 'hygiene' in data.Q14b;
+      return version === 1 || hasV1Keys;
+    });
+
+    const v2Responses = responses.filter(r => {
+      const version = r.surveyVersion || 1;
+      const data = r.data as any;
+      const hasV1Keys = data.Q14b && typeof data.Q14b === 'object' && 'hygiene' in data.Q14b;
+      return version === 2 && !hasV1Keys;
+    });
 
     const workbook = new ExcelJS.Workbook();
     workbook.creator = 'Groupes Dentaires Survey';

@@ -12,6 +12,7 @@ import {
   CompositeIndex,
   DescriptiveStats,
 } from '@/lib/stats';
+import { convertOldSegmentData, convertOldSegmentSelection } from '@/lib/questions';
 
 // Variable pairs for comparison
 const variablePairs = [
@@ -42,7 +43,7 @@ export async function GET() {
     // Fetch all completed responses
     const responses = await prisma.response.findMany({
       where: { completed: true },
-      select: { data: true, createdAt: true },
+      select: { data: true, createdAt: true, surveyVersion: true },
     });
 
     if (responses.length === 0) {
@@ -52,12 +53,32 @@ export async function GET() {
       });
     }
 
-    // Separate by practice type (Q0)
+    // Separate by practice type (Q0) and convert v1 segment data to v2 format
     const groupResponses: any[] = []; // Q0 = 'A'
     const independentResponses: any[] = []; // Q0 = 'B' or 'C'
 
     for (const response of responses) {
       const data = response.data as Record<string, any>;
+      const surveyVersion = response.surveyVersion || 1;
+
+      // Convert v1 segment data to v2 format
+      if (surveyVersion === 1) {
+        // Convert percentage distributions (Q14b, Q15b)
+        if (data.Q14b && typeof data.Q14b === 'object') {
+          data.Q14b = convertOldSegmentData(data.Q14b);
+        }
+        if (data.Q15b && typeof data.Q15b === 'object') {
+          data.Q15b = convertOldSegmentData(data.Q15b);
+        }
+        // Convert multiple choice selections (Q14, Q15)
+        if (data.Q14 && Array.isArray(data.Q14)) {
+          data.Q14 = convertOldSegmentSelection(data.Q14);
+        }
+        if (data.Q15 && Array.isArray(data.Q15)) {
+          data.Q15 = convertOldSegmentSelection(data.Q15);
+        }
+      }
+
       if (data.Q0 === 'A') {
         groupResponses.push(data);
       } else if (data.Q0 === 'B' || data.Q0 === 'C') {

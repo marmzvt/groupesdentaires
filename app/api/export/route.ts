@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
-import { questions } from '@/lib/questions';
+import { questions, convertOldSegmentData, convertOldSegmentSelection, oldSegmentKeys } from '@/lib/questions';
 
 // Force dynamic rendering (no caching)
 export const dynamic = 'force-dynamic';
@@ -9,18 +9,33 @@ export const revalidate = 0;
 // Helper to flatten response data
 function flattenResponse(response: any): Record<string, any> {
   const data = response.data as Record<string, any>;
+  const surveyVersion = response.surveyVersion || 1;
   const flat: Record<string, any> = {
     id: response.id,
     createdAt: response.createdAt.toISOString(),
     completed: response.completed,
-    surveyVersion: response.surveyVersion || 1,
+    surveyVersion: surveyVersion,
     structureName: response.structureName || '',
   };
 
+  // Segment-related questions that need conversion for v1 data
+  const segmentQuestions = ['Q14', 'Q14b', 'Q15', 'Q15b'];
+
   // Add all question answers
   questions.forEach((q) => {
-    const value = data[q.id];
+    let value = data[q.id];
     if (value !== undefined) {
+      // Convert v1 segment data to v2 format
+      if (surveyVersion === 1 && segmentQuestions.includes(q.id)) {
+        if (q.type === 'percentage_distribution' && typeof value === 'object') {
+          // Convert v1 percentage distribution to v2 format
+          value = convertOldSegmentData(value);
+        } else if (q.type === 'multiple' && Array.isArray(value)) {
+          // Convert v1 segment selection to v2 format
+          value = convertOldSegmentSelection(value);
+        }
+      }
+
       if (q.type === 'percentage_distribution' && typeof value === 'object') {
         // Flatten percentage distribution into separate columns
         Object.entries(value).forEach(([key, pct]) => {

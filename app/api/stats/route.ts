@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
+import { convertOldSegmentData, convertOldSegmentSelection } from '@/lib/questions';
 
 // Labels for options
 const optionLabels: Record<string, Record<string | number, string>> = {
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
     // Get all completed responses with filters
     const responses = await prisma.response.findMany({
       where,
-      select: { data: true, createdAt: true, structureName: true },
+      select: { data: true, createdAt: true, structureName: true, surveyVersion: true },
     });
 
     // Global counts (no filters)
@@ -96,10 +97,21 @@ export async function GET(request: NextRequest) {
 
       responses.forEach((r) => {
         const data = r.data as Record<string, any>;
-        const answer = data[q.id];
+        const surveyVersion = r.surveyVersion || 1;
+        let answer = data[q.id];
 
         if (answer === undefined || answer === null) return;
         answeredCount++;
+
+        // Convert v1 segment data to v2 format for segment-related questions
+        const segmentQuestions = ['Q14', 'Q14b', 'Q15', 'Q15b'];
+        if (surveyVersion === 1 && segmentQuestions.includes(q.id)) {
+          if (q.type === 'percentage' && typeof answer === 'object') {
+            answer = convertOldSegmentData(answer);
+          } else if (q.type === 'multiple' && Array.isArray(answer)) {
+            answer = convertOldSegmentSelection(answer);
+          }
+        }
 
         if (q.type === 'single') {
           const key = String(answer);
